@@ -1,0 +1,2027 @@
+document.addEventListener("DOMContentLoaded", function () {
+  initTinyMCE();
+  initForm1();
+  updatePropertyButtons();
+  toggleAcquiredDisposed();
+});
+
+function initForm1() {
+  const form = document.getElementById("form1");
+  if (!form) return;
+
+  const firstBlock = document.querySelector(".property-block");
+  prefillApplicantRow(firstBlock);
+
+  const acquiredDisposed = form.querySelector('[name="acquired_disposed"]');
+  const purpose = form.querySelector('[name="purpose"]');
+
+  const modeAcquisitionBlock = document.getElementById("mode_acquisition");
+  const modeDisposalBlock = document.getElementById("mode_disposal");
+  const acquisitionGift = document.getElementById("acquisition_gift");
+  const date_acq_dis = document.getElementById("date_acq_dis");
+
+  const form1Inparts = document.getElementById("form1_inparts");
+  const form1Full = document.getElementById("form1_full");
+  const dateLabel = document.getElementById("date_acquisition_disposed");
+
+  /* =========================
+     SHOW / HIDE
+  ========================= */
+  const safeShow = (el) => el && el.classList.remove("d-none");
+  const safeHide = (el) => el && el.classList.add("d-none");
+
+  function appendPropertyBlockForHydration() {
+    const blocks = form.querySelectorAll(".property-block");
+    const currentBlock = blocks[blocks.length - 1];
+    if (!currentBlock) return null;
+
+    if (typeof tinymce !== "undefined") {
+      tinymce.remove();
+    }
+
+    const clone = currentBlock.cloneNode(true);
+    clone.querySelectorAll(".tox-tinymce").forEach((el) => el.remove());
+
+    clone.querySelectorAll("textarea").forEach((el, index) => {
+      el.value = "";
+      el.id = "editor_" + Date.now() + "_" + index;
+    });
+
+    clone.querySelectorAll("input").forEach((el) => {
+      if (el.type !== "file") el.value = "";
+      el.classList.remove("is-invalid");
+    });
+
+    clone.querySelectorAll('input[type="file"]').forEach((fileInput) => {
+      const newInput = fileInput.cloneNode(true);
+      newInput.value = "";
+      fileInput.parentNode.replaceChild(newInput, fileInput);
+    });
+
+    clone.querySelectorAll("select").forEach((el) => {
+      el.selectedIndex = 0;
+    });
+
+    clone
+      .querySelectorAll(".row-item-applicant:not(:first-child)")
+      .forEach((el) => el.remove());
+    clone
+      .querySelectorAll(".row-item-source:not(:first-child)")
+      .forEach((el) => el.remove());
+    clone.querySelectorAll(".price_in_text").forEach((el) => {
+      el.textContent = "";
+    });
+
+    const cloneSource = clone.querySelector(".acquisition_sources");
+    const cloneDisposal = clone.querySelector(".disposal_property");
+    const currentSource = currentBlock.querySelector(".acquisition_sources");
+    const currentDisposal = currentBlock.querySelector(".disposal_property");
+
+    if (currentSource && currentSource.offsetParent !== null) {
+      safeShow(cloneSource);
+    } else {
+      safeHide(cloneSource);
+    }
+
+    if (currentDisposal && currentDisposal.offsetParent !== null) {
+      safeShow(cloneDisposal);
+    } else {
+      safeHide(cloneDisposal);
+    }
+
+    const relDesc = clone.querySelector(
+      '[name="party_relationship_description[]"]',
+    );
+    if (relDesc) {
+      relDesc.value = "";
+      safeHide(relDesc);
+    }
+
+    const relSelect = clone.querySelector('[name="party_relationship[]"]');
+    if (relSelect) relSelect.value = "";
+
+    const dealingDesc = clone.querySelector(
+      '[name="applicant_dealing_parties_description[]"]',
+    );
+    if (dealingDesc) {
+      dealingDesc.value = "";
+      safeHide(dealingDesc);
+    }
+
+    const dealingSelect = clone.querySelector(
+      '[name="applicant_dealing_parties[]"]',
+    );
+    if (dealingSelect) dealingSelect.value = "";
+
+    currentBlock.after(clone);
+    updatePropertyButtons();
+    toggleAcquiredDisposed();
+    initTinyMCE();
+    return clone;
+  }
+
+  window.__appendPropertyBlockForm1 = appendPropertyBlockForHydration;
+
+  /* =========================
+     REMOVE INVALID
+  ========================= */
+  function removeInvalid(field) {
+    if (!field || !field.matches) return;
+
+    // skip hidden fields
+    if (field.disabled || field.hidden) return;
+
+    let isValid = true;
+
+    if (field.type === "checkbox") {
+      isValid = field.checked;
+    } else if (field.type === "file") {
+      isValid = field.files.length > 0;
+    } else {
+      isValid = field.value && field.value.trim() !== "";
+    }
+
+    if (isValid) {
+      field.classList.remove("is-invalid");
+
+      // also clear custom error (if any)
+      const block = field.closest(".property-block");
+      if (block) {
+        const interestError = block.querySelector(".interest_error");
+        const sourceError = block.querySelector(".source_error");
+
+        if (interestError) interestError.textContent = "";
+        if (sourceError) sourceError.textContent = "";
+      }
+    }
+  }
+
+  form.addEventListener("input", (e) => removeInvalid(e.target));
+  form.addEventListener("change", (e) => removeInvalid(e.target));
+
+  /* =========================
+     ACQUIRED / DISPOSED
+  ========================= */
+  function handleAcquiredDisposed() {
+    const value = acquiredDisposed?.value;
+
+    form.querySelectorAll(".property-block").forEach((block) => {
+      const source = block.querySelector(".acquisition_sources");
+      const disposal = block.querySelector(".disposal_property");
+      const priceLabel = block.querySelector(".property_price_label");
+
+      if (value === "acquired") {
+        priceLabel &&
+          (priceLabel.innerText = "Purchase price of the property (₹)");
+        dateLabel && (dateLabel.innerText = "Probable date of acquisition");
+
+        safeShow(modeAcquisitionBlock);
+        safeHide(modeDisposalBlock);
+        safeShow(source);
+        safeHide(disposal);
+        safeShow(date_acq_dis);
+      } else if (value === "disposed") {
+        priceLabel && (priceLabel.innerText = "Sale price of the property (₹)");
+        dateLabel && (dateLabel.innerText = "Probable date of disposal");
+
+        safeShow(modeDisposalBlock);
+        safeHide(modeAcquisitionBlock);
+        safeHide(source);
+        safeShow(disposal);
+        safeShow(date_acq_dis);
+      } else if (value === "") {
+        safeHide(source);
+        safeHide(disposal);
+        safeHide(modeDisposalBlock);
+        safeHide(modeAcquisitionBlock);
+        safeHide(date_acq_dis);
+      }
+    });
+
+    toggleGift();
+  }
+
+  function toggleGift() {
+    const mode = form.querySelector('[name="mode_acquisition"]')?.value;
+    const giftFields = acquisitionGift?.querySelectorAll(
+      "input,select,textarea",
+    );
+
+    if (mode === "Gift" && acquiredDisposed?.value === "acquired") {
+      safeShow(acquisitionGift);
+      giftFields?.forEach((f) => f.setAttribute("required", "required"));
+    } else {
+      safeHide(acquisitionGift);
+      giftFields?.forEach((f) => {
+        f.removeAttribute("required");
+        f.classList.remove("is-invalid");
+      });
+    }
+  }
+
+  acquiredDisposed?.addEventListener("change", handleAcquiredDisposed);
+
+  form.addEventListener("change", (e) => {
+    if (e.target.name === "mode_acquisition") toggleGift();
+  });
+
+  /* =========================
+     PURPOSE
+  ========================= */
+  purpose?.addEventListener("change", function () {
+    if (this.value === "Sanction for transaction") {
+      safeShow(form1Inparts);
+      safeHide(form1Full);
+    } else {
+      safeShow(form1Full);
+      safeHide(form1Inparts);
+    }
+  });
+
+  /* =========================
+     CLICK HANDLER
+  ========================= */
+  form.addEventListener("click", (e) => {
+    /* ===== ADD APPLICANT ===== */
+    if (e.target.closest(".addRow_applicant")) {
+      const container = e.target.closest(".rows_applicant");
+      const rows = container.querySelectorAll(".row-item-applicant");
+      const lastRow = rows[rows.length - 1];
+      const isHydratingEdit = window.__isHydratingEdit === true;
+
+      if (!isHydratingEdit) {
+        const nameInput = lastRow?.querySelector('[name="name_applicant[]"]');
+        const interestInput = lastRow?.querySelector(
+          '[name="interest_applicant[]"]',
+        );
+        const relSelect = lastRow?.querySelector(
+          '[name="relationship_applicant[]"]',
+        );
+
+        if (shouldValidate(nameInput) && !nameInput.value.trim()) {
+          return showError(
+            nameInput,
+            "Please complete the current applicant row (name) before adding another.",
+          );
+        }
+        if (shouldValidate(interestInput)) {
+          const iv = interestInput.value.trim();
+          const n = Number(iv);
+          if (!iv || Number.isNaN(n) || n < 0 || n > 100) {
+            return showError(
+              interestInput,
+              "Please enter a valid interest % (0–100) for the current applicant before adding another.",
+            );
+          }
+        }
+        if (shouldValidate(relSelect) && !relSelect.value) {
+          return showError(
+            relSelect,
+            "Please select relationship for the current applicant before adding another.",
+          );
+        }
+      }
+
+      const templateRow = container.querySelector(".row-item-applicant");
+      const clone = templateRow.cloneNode(true);
+
+      clone.querySelectorAll("input").forEach((i) => (i.value = ""));
+      clone.querySelectorAll("select").forEach((s) => (s.selectedIndex = 0));
+
+      container.appendChild(clone);
+    }
+
+    /* ===== REMOVE APPLICANT ===== */
+    if (e.target.closest(".removeRow_applicant")) {
+      const container = e.target.closest(".rows_applicant");
+      if (container.children.length > 1) {
+        e.target.closest(".row-item-applicant").remove();
+      }
+    }
+
+    /* ===== ADD SOURCE ===== */
+    if (e.target.closest(".addRow_source")) {
+      const container = e.target.closest(".rows_source");
+      const rows = container.querySelectorAll(".row-item-source");
+      const lastRow = rows[rows.length - 1];
+      const isHydratingEdit = window.__isHydratingEdit === true;
+
+      if (!isHydratingEdit) {
+        // Only validate required fields
+        const requiredFields = lastRow.querySelectorAll("input[required]");
+
+        let isValid = true;
+        let firstInvalid = null;
+
+        requiredFields.forEach((el) => {
+          if (!el.value || el.value.trim() === "") {
+            isValid = false;
+            el.classList.add("error"); // optional styling
+            if (!firstInvalid) firstInvalid = el;
+          } else {
+            el.classList.remove("error");
+          }
+        });
+
+        if (!isValid) {
+          showError(
+            firstInvalid,
+            "Please fill source name and amount fields before adding a new row.",
+          );
+          if (firstInvalid) firstInvalid.focus();
+          return;
+        }
+      }
+
+      // Clone last row
+      const clone = lastRow.cloneNode(true);
+
+      // Clear values
+      clone.querySelectorAll("input").forEach((input) => {
+        if (input.type === "file") {
+          input.value = ""; // reset file input
+          if (input.dataset) delete input.dataset.existingFileKey;
+        } else {
+          input.value = "";
+        }
+      });
+      clone
+        .querySelectorAll(
+          ".js-existing-source-attachment, .js-existing-disposal-attachment",
+        )
+        .forEach((el) => {
+          el.classList.add("d-none");
+          el.innerHTML = "";
+        });
+
+      container.appendChild(clone);
+    }
+
+    /* ===== REMOVE SOURCE ===== */
+    if (e.target.closest(".removeRow_source")) {
+      const container = e.target.closest(".rows_source");
+      if (container.children.length > 1) {
+        e.target.closest(".row-item-source").remove();
+      }
+    }
+
+    /* ===== ADD PROPERTY BLOCK ===== */
+    if (e.target.closest(".addPropertyBtn")) {
+      const isHydratingEdit = window.__isHydratingEdit === true;
+      if (!isHydratingEdit && acquiredDisposed.value === "") {
+        return showError(
+          acquiredDisposed,
+          "Please select Acquired or Disposed field first.",
+        );
+      }
+
+      const currentBlock = e.target.closest(".property-block");
+
+      if (!isHydratingEdit && typeof tinymce !== "undefined") {
+        tinymce.triggerSave();
+      }
+      if (!isHydratingEdit) {
+        clearErrors();
+      }
+
+      if (!isHydratingEdit) {
+        /* =========================
+        REQUIRED FIELDS
+      ========================= */
+        let firstInvalid = null;
+
+        currentBlock
+          .querySelectorAll("input, select, textarea")
+          .forEach((field) => {
+            if (!shouldValidate(field)) return;
+            if (field.type === "file") return;
+
+            if (!field.value || field.value.trim() === "") {
+              field.classList.add("is-invalid");
+              if (!firstInvalid) firstInvalid = field;
+            }
+          });
+
+        if (firstInvalid) {
+          return showError(firstInvalid, "Please fill the required field");
+        }
+
+        /* =========================
+        PRICE VALIDATION
+      ========================= */
+
+        const priceInput = currentBlock.querySelector(".property_price");
+        if (!shouldValidate(priceInput)) return;
+        const value = priceInput.value.trim();
+        const price = Number(value);
+        if (price > 999999999) {
+          return showError(priceInput, "Amount exceeds 99.99 crores limit");
+        }
+
+        /* =========================
+        INTEREST VALIDATION
+      ========================= */
+        let interestTotal = 0;
+        const interestInputs =
+          currentBlock.querySelectorAll(".interest_percent");
+
+        interestInputs.forEach((i) => {
+          if (i.value) interestTotal += Number(i.value) || 0;
+        });
+
+        if (interestTotal !== 100) {
+          return showError(
+            interestInputs[0],
+            `Total interest must be 100% (current: ${interestTotal}%)`,
+          );
+        }
+
+        /* =========================
+        SOURCE VALIDATION
+      ========================= */
+        const sourceBlock = currentBlock.querySelector(".acquisition_sources");
+
+        if (sourceBlock && isVisible(sourceBlock)) {
+          const price =
+            Number(currentBlock.querySelector(".property_price")?.value) || 0;
+
+          let sourceTotal = 0;
+          let firstSource = null;
+
+          currentBlock.querySelectorAll(".source_amount").forEach((s) => {
+            if (!shouldValidate(s)) return;
+
+            if (!firstSource) firstSource = s;
+            if (s.value) sourceTotal += Number(s.value) || 0;
+          });
+
+          if (price !== sourceTotal) {
+            return showError(
+              firstSource,
+              `Source total ₹${sourceTotal} must equal price ₹${price}`,
+            );
+          }
+        }
+
+        /* =========================
+        CONDITIONAL VALIDATION
+      ========================= */
+
+        // DISPOSAL
+        const disposal = currentBlock.querySelector(
+          '[name="disposal_property[]"]',
+        );
+        const file = currentBlock.querySelector(
+          '[name="disposal_property_attachment[]"]',
+        );
+        const reason = currentBlock.querySelector(
+          '[name="disposal_property_reason[]"]',
+        );
+
+        if (shouldValidate(disposal)) {
+          if (disposal.value === "Yes") {
+            if (file && isVisible(file) && file.files.length === 0) {
+              return showError(
+                file,
+                "Please upload Sanction/intimation attachment",
+              );
+            }
+          }
+
+          if (disposal.value === "No") {
+            if (reason && isVisible(reason) && !reason.value.trim()) {
+              return showError(
+                reason,
+                "Please provide reason for Sanction/intimation",
+              );
+            }
+          }
+        }
+
+        // RELATIONSHIP
+        const rel = currentBlock.querySelector('[name="party_relationship[]"]');
+        const relaDesc = currentBlock.querySelector(
+          '[name="party_relationship_description[]"]',
+        );
+
+        if (shouldValidate(rel) && rel.value === "yes") {
+          if (relaDesc && isVisible(relaDesc) && !relaDesc.value.trim()) {
+            return showError(
+              relaDesc,
+              "Please describe relationship with party",
+            );
+          }
+        }
+
+        // DEALING
+        const deal = currentBlock.querySelector(
+          '[name="applicant_dealing_parties[]"]',
+        );
+        const dealDesc = currentBlock.querySelector(
+          '[name="applicant_dealing_parties_description[]"]',
+        );
+
+        if (shouldValidate(deal) && deal.value === "yes") {
+          if (dealDesc && isVisible(dealDesc) && !dealDesc.value.trim()) {
+            return showError(dealDesc, "Please provide dealing details");
+          }
+        }
+      }
+
+      /* =========================
+        CLONE BLOCK
+      ========================= */
+
+      //  DESTROY existing editors BEFORE cloning
+      if (typeof tinymce !== "undefined") {
+        tinymce.remove();
+      }
+
+      const clone = currentBlock.cloneNode(true);
+
+      //  REMOVE TinyMCE UI (VERY IMPORTANT)
+      clone.querySelectorAll(".tox-tinymce").forEach((el) => el.remove());
+
+      clone.querySelectorAll("textarea").forEach((el, index) => {
+        el.value = "";
+        el.id = "editor_" + Date.now() + "_" + index;
+      });
+
+      // RESET INPUTS
+      clone.querySelectorAll("input").forEach((el) => {
+        if (el.type !== "file") el.value = "";
+        el.classList.remove("is-invalid");
+      });
+
+      // RESET FILE INPUTS PROPERLY
+      clone.querySelectorAll('input[type="file"]').forEach((fileInput) => {
+        const newInput = fileInput.cloneNode(true);
+        newInput.value = "";
+        fileInput.parentNode.replaceChild(newInput, fileInput);
+      });
+
+      // RESET SELECTS
+      clone.querySelectorAll("select").forEach((el) => {
+        el.selectedIndex = 0;
+      });
+
+      // KEEP ONLY ONE ROW
+      clone
+        .querySelectorAll(".row-item-applicant:not(:first-child)")
+        .forEach((el) => el.remove());
+
+      clone
+        .querySelectorAll(".row-item-source:not(:first-child)")
+        .forEach((el) => el.remove());
+
+      // CLEAR TEXT OUTPUT
+      clone.querySelectorAll(".price_in_text").forEach((el) => {
+        el.textContent = "";
+      });
+
+      /* =========================
+        FIX VISIBILITY
+      ========================= */
+
+      const cloneSource = clone.querySelector(".acquisition_sources");
+      const cloneDisposal = clone.querySelector(".disposal_property");
+
+      const currentSource = currentBlock.querySelector(".acquisition_sources");
+      const currentDisposal = currentBlock.querySelector(".disposal_property");
+
+      if (currentSource && currentSource.offsetParent !== null) {
+        safeShow(cloneSource);
+      } else {
+        safeHide(cloneSource);
+      }
+
+      if (currentDisposal && currentDisposal.offsetParent !== null) {
+        safeShow(cloneDisposal);
+      } else {
+        safeHide(cloneDisposal);
+      }
+
+      /* =========================
+        RESET DEPENDENT FIELDS
+      ========================= */
+
+      // party relationship
+      const relDesc = clone.querySelector(
+        '[name="party_relationship_description[]"]',
+      );
+
+      if (relDesc) {
+        relDesc.value = "";
+        safeHide(relDesc);
+      }
+
+      const relSelect = clone.querySelector('[name="party_relationship[]"]');
+      if (relSelect) relSelect.value = "";
+
+      // applicant dealing
+      const dealingDesc = clone.querySelector(
+        '[name="applicant_dealing_parties_description[]"]',
+      );
+      if (dealingDesc) {
+        dealingDesc.value = "";
+        safeHide(dealingDesc);
+      }
+
+      const dealingSelect = clone.querySelector(
+        '[name="applicant_dealing_parties[]"]',
+      );
+      if (dealingSelect) dealingSelect.value = "";
+
+      /* =========================
+        APPEND BLOCK
+      ========================= */
+
+      currentBlock.after(clone);
+      updatePropertyButtons();
+      toggleAcquiredDisposed();
+
+      // RE-INITIALIZE TinyMCE CLEANLY
+      initTinyMCE();
+
+      if (!isHydratingEdit) {
+        clone.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+
+    /* ===== REMOVE PROPERTY BLOCK ===== */
+    if (e.target.closest(".removePropertyBtn")) {
+      const blocks = form.querySelectorAll(".property-block");
+      const currentBlock = e.target.closest(".property-block");
+      if (!currentBlock) return;
+
+      if (blocks.length === 1) {
+        alert("At least one property block is required");
+        return;
+      }
+
+      showConfirm("Do you want to remove this property?").then(
+        (isConfirmed) => {
+          if (!isConfirmed) return;
+
+          currentBlock.remove();
+
+          updatePropertyButtons();
+          toggleAcquiredDisposed();
+        },
+      );
+    }
+  });
+
+  /* =========================
+     CHANGE EVENTS (FIXED [])
+  ========================= */
+  form.addEventListener("change", (e) => {
+    const target = e.target;
+    const block = e.target.closest(".property-block");
+    if (!block) return;
+
+    /* ===== disposal ===== */
+    if (
+      e.target.name === "disposal_property[]" &&
+      e.target.tagName === "SELECT"
+    ) {
+      const file = block.querySelector(
+        '[name="disposal_property_attachment[]"]',
+      );
+      const reason = block.querySelector(
+        'textarea[name="disposal_property_reason[]"]',
+      );
+
+      if (e.target.value === "Yes") {
+        safeShow(file);
+        safeHide(reason);
+      } else if (e.target.value === "No") {
+        safeShow(reason);
+        safeHide(file);
+      }
+    }
+
+    /* ===== relationship ===== */
+    if (
+      e.target.name === "party_relationship[]" &&
+      e.target.tagName === "SELECT"
+    ) {
+      const desc = block.querySelector(
+        '[name="party_relationship_description[]"]',
+      );
+      const descBlock = block.querySelector(".party_relationship_description");
+
+      if (!desc) return;
+
+      if (e.target.value === "yes") {
+        safeShow(desc);
+        safeShow(descBlock);
+      } else if (e.target.value === "no" || e.target.value === "") {
+        desc.value = "";
+        safeHide(desc);
+        safeHide(descBlock);
+      }
+    }
+
+    /* ===== dealing ===== */
+    if (
+      e.target.name === "applicant_dealing_parties[]" &&
+      e.target.tagName === "SELECT"
+    ) {
+      const desc = block.querySelector(
+        '[name="applicant_dealing_parties_description[]"]',
+      );
+      const descBlock = block.querySelector(
+        ".applicant_dealing_parties_description",
+      );
+
+      if (!desc) return;
+
+      if (e.target.value === "yes") {
+        safeShow(desc);
+        safeShow(descBlock);
+      } else if (e.target.value === "no" || e.target.value === "") {
+        desc.value = "";
+        safeHide(desc);
+        safeHide(descBlock);
+      }
+    }
+
+    // validate file upload
+    if (
+      target.matches(
+        'input[type="file"][name="source_document[]"], input[type="file"][name="disposal_property_attachment[]"]',
+      )
+    ) {
+      const file = target.files[0];
+      if (!file) return;
+
+      const fileName = file.name.toLowerCase();
+
+      // basic check
+      if (!fileName.endsWith(".pdf")) {
+        alert("Only PDF files allowed!");
+        target.value = "";
+        return;
+      }
+
+      // signature check (REAL validation)
+      const reader = new FileReader();
+
+      reader.onload = function () {
+        const arr = new Uint8Array(reader.result).subarray(0, 5);
+        let header = "";
+
+        for (let i = 0; i < arr.length; i++) {
+          header += String.fromCharCode(arr[i]);
+        }
+
+        // PDF signature check
+        if (header !== "%PDF-") {
+          alert("❌ Invalid PDF file! File content is not PDF.");
+          target.value = "";
+          return;
+        }
+      };
+
+      reader.readAsArrayBuffer(file.slice(0, 5));
+    }
+  });
+
+  form.addEventListener("focusout", (e) => {
+    const block = e.target.closest(".property-block");
+    if (!block) return;
+
+    const rel = block.querySelector('[name="party_relationship[]"]');
+    const relDesc = block.querySelector(
+      'textarea[name="party_relationship_description[]"]',
+    );
+
+    if (rel && relDesc) {
+      relDesc.classList.toggle("d-none", rel.value !== "yes");
+    }
+
+    const deal = block.querySelector('[name="applicant_dealing_parties[]"]');
+    const dealDesc = block.querySelector(
+      'textarea[name="applicant_dealing_parties_description[]"]',
+    );
+
+    if (deal && dealDesc) {
+      dealDesc.classList.toggle("d-none", deal.value !== "yes");
+    }
+  });
+
+  function cleanValue(value) {
+    return value.replace(/[^a-zA-Z0-9 ,.\-]/g, "");
+  }
+
+  /* =========================
+   INPUT HANDLER
+    ========================= */
+  form.addEventListener("input", handleFormInput);
+
+  function handleFormInput(e) {
+    // Prevent overwrite during edit hydration
+    if (window.__isHydratingEdit) return;
+
+    const target = e.target;
+    if (!target) return;
+
+    const block = target.closest(".property-block");
+    if (!block) return;
+
+    /* ===== ROUTING ===== */
+    if (target.classList.contains("allow-basic")) {
+      handleAllowBasic(target);
+    }
+
+    if (target.classList.contains("interest_percent")) {
+      handleInterestPercent(target, block);
+    }
+
+    if (target.classList.contains("property_price")) {
+      handlePropertyPrice(target, block);
+    }
+
+    if (target.classList.contains("source_amount")) {
+      handleSourceAmount(target);
+    }
+
+    /* ===== REMOVE INVALID ON TYPE ===== */
+    if (target.classList.contains("is-invalid")) {
+      target.classList.remove("is-invalid");
+    }
+  }
+
+  function handleAllowBasic(input) {
+    const cleaned = input.value.replace(/[^a-zA-Z0-9 ,.\-]/g, "");
+
+    if (input.value !== cleaned) {
+      const pos = input.selectionStart;
+      input.value = cleaned;
+
+      // prevent cursor jump
+      setTimeout(() => {
+        input.setSelectionRange(pos - 1, pos - 1);
+      }, 0);
+    }
+  }
+
+  function handleInterestPercent(input, block) {
+    let value = input.value.replace(/[^0-9.]/g, "");
+    let num = parseFloat(value);
+
+    if (!isNaN(num)) {
+      if (num > 100) num = 100;
+      if (num < 0) num = 0;
+    }
+
+    input.value = value ? num : "";
+
+    const addBtn = block.querySelector(".addRow_applicant");
+
+    if (num === 100) {
+      addBtn && addBtn.classList.add("d-none");
+    } else {
+      addBtn && addBtn.classList.remove("d-none");
+    }
+  }
+
+  function handlePropertyPrice(input, block) {
+    let digits = input.value.replace(/\D/g, "");
+
+    // limit to 9 digits
+    if (digits.length > 9) {
+      digits = digits.slice(0, 9);
+    }
+
+    if (input.value !== digits) {
+      input.value = digits;
+    }
+
+    const output = block.querySelector(".price_in_text");
+    if (!output) return;
+
+    const num = parseFloat(digits);
+
+    if (!digits || isNaN(num)) {
+      output.textContent = "";
+      output.classList.remove("text-danger", "text-success");
+      return;
+    }
+
+    output.textContent = `( ${numberToWords(num)} )`;
+
+    if (num > 999999999) {
+      output.classList.add("text-danger");
+      output.classList.remove("text-success");
+    } else {
+      output.classList.add("text-success");
+      output.classList.remove("text-danger");
+    }
+  }
+
+  function handleSourceAmount(input) {
+    let digits = input.value.replace(/\D/g, "");
+
+    if (digits.length > 9) {
+      digits = digits.slice(0, 9);
+    }
+
+    input.value = digits;
+
+    const num = parseFloat(digits);
+
+    if (num > 999999999) {
+      input.classList.add("is-invalid");
+      input.setCustomValidity("Amount exceeds 99.99 crores limit");
+    } else {
+      input.classList.remove("is-invalid");
+      input.setCustomValidity("");
+    }
+  }
+
+  form.addEventListener("keypress", function (e) {
+    if (e.target.classList.contains("allow-basic")) {
+      if (!/[a-zA-Z0-9 ,\-]/.test(e.key)) {
+        e.preventDefault();
+      }
+    }
+  });
+
+  form.addEventListener("paste", function (e) {
+    if (e.target.classList.contains("allow-basic")) {
+      e.preventDefault();
+
+      let paste = (e.clipboardData || window.clipboardData).getData("text");
+      paste = cleanValue(paste);
+
+      document.execCommand("insertText", false, paste);
+    }
+  });
+
+  handleAcquiredDisposed();
+}
+
+function showConfirm(message) {
+  return new Promise((resolve) => {
+    const modalEl = document.getElementById("confirmModal");
+    const messageEl = document.getElementById("confirmMessage");
+    const okBtn = document.getElementById("confirmOkBtn");
+    const cancelBtn = document.getElementById("confirmCancelBtn");
+
+    messageEl.textContent = message;
+
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+
+    // Focus CANCEL by default
+    modalEl.addEventListener(
+      "shown.bs.modal",
+      () => {
+        cancelBtn.focus();
+      },
+      { once: true },
+    );
+
+    function cleanup(result) {
+      modal.hide();
+      resolve(result);
+    }
+
+    okBtn.onclick = () => cleanup(true);
+    cancelBtn.onclick = () => cleanup(false);
+
+    // Handle close (X button / backdrop click)
+    modalEl.addEventListener(
+      "hidden.bs.modal",
+      () => {
+        resolve(false);
+      },
+      { once: true },
+    );
+  });
+}
+
+function prefillApplicantRow(block) {
+  if (!block) return;
+
+  const firstRow = block.querySelector(".row-item-applicant");
+  if (!firstRow) return;
+
+  const nameInput = firstRow.querySelector('[name="name_applicant[]"]');
+  const relationSelect = firstRow.querySelector(
+    '[name="relationship_applicant[]"]',
+  );
+
+  if (nameInput && !nameInput.value) {
+    nameInput.value = sessionStorage.getItem("username") || "";
+  }
+
+  if (relationSelect && !relationSelect.value) {
+    relationSelect.value = "Self";
+  }
+}
+
+//handle disabled aquired disposed for property block more then 1
+function toggleAcquiredDisposed() {
+  const field = document.querySelector('[name="acquired_disposed"]');
+  const count = document.querySelectorAll(
+    "#property-container .property-block",
+  ).length;
+
+  if (!field) return;
+
+  let hidden = document.getElementById("acquired_hidden");
+
+  if (count > 1) {
+    field.setAttribute("disabled", "disabled");
+
+    if (!hidden) {
+      hidden = document.createElement("input");
+      hidden.type = "hidden";
+      hidden.name = "acquired_disposed";
+      hidden.id = "acquired_hidden";
+      field.after(hidden);
+    }
+
+    hidden.value = field.value;
+  } else {
+    field.removeAttribute("disabled");
+
+    if (hidden) hidden.remove();
+  }
+}
+
+/*=============================
+ handel button toggle on property block
+==============================*/
+function updatePropertyButtons() {
+  const blocks = document.querySelectorAll(".property-block");
+
+  blocks.forEach((block, index) => {
+    const addBtn = block.querySelector(".addPropertyBtn");
+    const removeBtn = block.querySelector(".removePropertyBtn");
+
+    if (addBtn) addBtn.style.display = "none";
+    if (removeBtn) removeBtn.style.display = "inline-block";
+
+    // last block → show ADD
+    if (index === blocks.length - 1) {
+      if (addBtn) addBtn.style.display = "inline-block";
+    }
+
+    // first block → hide REMOVE if only one
+    if (blocks.length === 1 && removeBtn) {
+      removeBtn.style.display = "none";
+    }
+  });
+}
+
+/* =========================
+   TINYMCE
+========================= */
+function initTinyMCE() {
+  if (typeof tinymce === "undefined") return Promise.resolve();
+
+  //  Save content before removing editors
+  tinymce.triggerSave();
+
+  //  Remove existing editors safely
+  tinymce.remove(".party_address");
+
+  //  Assign UNIQUE IDs (important for cloned blocks)
+  document.querySelectorAll("textarea.party_address").forEach((el, i) => {
+    if (!el.id) {
+      el.id = "party_address_" + Date.now() + "_" + i;
+    }
+  });
+
+  //  Initialize editors (returns Promise in TinyMCE 6+)
+  return tinymce.init({
+    selector: "textarea.party_address",
+    license_key: "gpl",
+    menubar: false,
+    toolbar: false,
+    statusbar: false,
+    height: 70,
+    resize: false,
+    branding: false,
+    content_style: "body { min-height:70px; margin:5px; }",
+    setup: function (editor) {
+      editor.on("input keyup change", function () {
+        const textarea = document.getElementById(editor.id);
+
+        if (textarea) {
+          textarea.classList.remove("is-invalid");
+        }
+
+        const container = editor.getContainer();
+        if (container) {
+          container.classList.remove("tinymce-error");
+        }
+      });
+    },
+  });
+}
+
+/* =========================
+   handle number to word converstion
+========================= */
+function numberToWords(amount) {
+  if (amount > 999999999) {
+    return "Amount out of range (exceeds 99.99 crores)";
+  }
+  const a = [
+    "",
+    "One",
+    "Two",
+    "Three",
+    "Four",
+    "Five",
+    "Six",
+    "Seven",
+    "Eight",
+    "Nine",
+    "Ten",
+    "Eleven",
+    "Twelve",
+    "Thirteen",
+    "Fourteen",
+    "Fifteen",
+    "Sixteen",
+    "Seventeen",
+    "Eighteen",
+    "Nineteen",
+  ];
+
+  const b = [
+    "",
+    "",
+    "Twenty",
+    "Thirty",
+    "Forty",
+    "Fifty",
+    "Sixty",
+    "Seventy",
+    "Eighty",
+    "Ninety",
+  ];
+
+  function twoDigits(n) {
+    return n < 20
+      ? a[n]
+      : b[Math.floor(n / 10)] + (n % 10 ? " " + a[n % 10] : "");
+  }
+
+  function convert(num) {
+    let str = "";
+
+    if (Math.floor(num / 10000000)) {
+      str += twoDigits(Math.floor(num / 10000000)) + " Crore ";
+      num %= 10000000;
+    }
+
+    if (Math.floor(num / 100000)) {
+      str += twoDigits(Math.floor(num / 100000)) + " Lakh ";
+      num %= 100000;
+    }
+
+    if (Math.floor(num / 1000)) {
+      str += twoDigits(Math.floor(num / 1000)) + " Thousand ";
+      num %= 1000;
+    }
+
+    if (Math.floor(num / 100)) {
+      str += a[Math.floor(num / 100)] + " Hundred ";
+      num %= 100;
+    }
+
+    if (num) {
+      str += (str !== "" ? "and " : "") + twoDigits(num) + " ";
+    }
+
+    return str.trim();
+  }
+
+  if (!amount || isNaN(amount)) return "Rupees Zero Only";
+
+  let [rupees, paise] = amount.toString().split(".");
+
+  rupees = parseInt(rupees, 10);
+  paise = parseInt((paise || "0").padEnd(2, "0").slice(0, 2), 10);
+
+  let result = "";
+
+  // Rupees part
+  if (rupees === 0) {
+    result = "Rupees Zero";
+  } else {
+    result = "Rupees " + convert(rupees);
+  }
+
+  // Paise part
+  if (paise > 0) {
+    result += " and " + twoDigits(paise) + " Paise";
+  }
+
+  return result + " Only";
+}
+
+/* =========================
+   MAIN VALIDATION (FORM1)
+========================= */
+function shouldValidate(field) {
+  if (!field) return false;
+
+  if (
+    field.type === "button" ||
+    field.type === "submit" ||
+    field.type === "file"
+  )
+    return false;
+
+  if (field.disabled) return false;
+
+  if (field.classList.contains("tinymce-editor")) return true;
+
+  if (!isVisible(field)) return false;
+
+  if (field.closest(".d-none")) return false;
+
+  return field.offsetParent !== null && !field.disabled;
+}
+
+function showError(field, message) {
+  if (!field) return false;
+
+  clearErrors();
+
+  field.classList.add("is-invalid");
+
+  if (typeof tinymce !== "undefined") {
+    const editor = tinymce.get(field.id);
+
+    if (editor) {
+      // Focus correctly
+      setTimeout(() => {
+        editor.focus();
+      }, 100);
+
+      // Add border to correct element
+      const container = editor.getContainer();
+      if (container) {
+        container.classList.add("tinymce-error");
+      }
+    } else {
+      field.focus();
+    }
+  } else {
+    field.focus();
+  }
+
+  field.scrollIntoView({ behavior: "smooth", block: "center" });
+
+  showAlert(message, "danger");
+  return false;
+}
+
+function clearErrors() {
+  document.querySelectorAll(".is-invalid").forEach((el) => {
+    el.classList.remove("is-invalid");
+  });
+
+  // remove TinyMCE borders
+  document.querySelectorAll(".tox-tinymce").forEach((el) => {
+    el.classList.remove("tinymce-error");
+  });
+}
+
+function isVisible(el) {
+  return el && el.offsetParent !== null;
+}
+
+function validateForm() {
+  const form = document.getElementById("form1");
+
+  if (typeof tinymce !== "undefined") {
+    tinymce.triggerSave();
+  }
+
+  clearErrors();
+
+  /* =========================
+     BASIC REQUIRED FIELDS
+  ========================= */
+  for (let field of form.querySelectorAll("input, select, textarea")) {
+    if (!shouldValidate(field)) continue;
+
+    // checkbox
+    if (field.type === "checkbox") {
+      if (field.required && !field.checked) {
+        return showError(field, "Please accept the declaration");
+      }
+      continue;
+    }
+
+    // required (skip TinyMCE)
+    if (field.required) {
+      if (field.classList.contains("tinymce-editor")) continue;
+
+      if (!field.value || field.value.trim() === "") {
+        console.log(field.name);
+        return showError(field, "Please fill the required field");
+      }
+    }
+  }
+
+  /* =========================
+    PRICE VALIDATION
+  ========================= */
+  for (let block of form.querySelectorAll(".property-block")) {
+    const priceInput = block.querySelector(".property_price");
+
+    if (!shouldValidate(priceInput)) continue;
+
+    const value = priceInput.value.trim();
+    const price = Number(value);
+
+    // Empty
+    if (!value) {
+      return showError(priceInput, "Please enter property value");
+    }
+
+    // Not a number
+    if (isNaN(price)) {
+      return showError(priceInput, "Price must be a valid number");
+    }
+
+    // Negative or zero
+    if (price <= 0) {
+      return showError(priceInput, "Price must be greater than 0");
+    }
+
+    // Max limit (99 crore)
+
+    if (price > 999999999) {
+      return showError(priceInput, "Amount exceeds 99 crore limit");
+    }
+  }
+
+  /* =========================
+     INTEREST VALIDATION
+  ========================= */
+  for (let block of form.querySelectorAll(".property-block")) {
+    const inputs = block.querySelectorAll(".interest_percent");
+
+    let total = 0;
+    let hasValue = false;
+
+    inputs.forEach((input) => {
+      if (!shouldValidate(input)) return;
+
+      if (input.value) {
+        hasValue = true;
+        total += Number(input.value) || 0;
+      }
+    });
+
+    if (hasValue && total !== 100) {
+      return showError(
+        inputs[0],
+        `Total interest must be 100% (current: ${total}%)`,
+      );
+    }
+  }
+
+  /* =========================
+     SOURCE VALIDATION
+  ========================= */
+  for (let block of form.querySelectorAll(".property-block")) {
+    const wrapper = block.querySelector(".acquisition_sources");
+
+    if (wrapper && !wrapper.classList.contains("d-none")) {
+      const price = Number(block.querySelector(".property_price")?.value) || 0;
+
+      let total = 0;
+      let hasSource = false;
+      let firstInput = null;
+
+      block.querySelectorAll(".source_amount").forEach((input) => {
+        if (!shouldValidate(input)) return;
+
+        if (!firstInput) firstInput = input;
+
+        if (input.value) {
+          hasSource = true;
+          total += Number(input.value) || 0;
+        }
+      });
+
+      if (hasSource && price !== total) {
+        return showError(
+          firstInput,
+          `Source total ₹${total} must equal price ₹${price}`,
+        );
+      }
+    }
+  }
+
+  /* =========================
+     CONDITIONAL VALIDATION
+  ========================= */
+  for (let block of form.querySelectorAll(".property-block")) {
+    // DISPOSAL
+    const disposal = block.querySelector('[name="disposal_property[]"]');
+    const file = block.querySelector('[name="disposal_property_attachment[]"]');
+    const reason = block.querySelector('[name="disposal_property_reason[]"]');
+
+    if (shouldValidate(disposal)) {
+      if (disposal.value === "Yes") {
+        if (file && isVisible(file) && file.files.length === 0) {
+          return showError(
+            file,
+            "Please upload Sanction/intimation attachment",
+          );
+        }
+      }
+
+      if (disposal.value === "No") {
+        if (reason && isVisible(reason) && !reason.value.trim()) {
+          return showError(
+            reason,
+            "Please provide reason for Sanction/intimation",
+          );
+        }
+      }
+    }
+
+    // RELATIONSHIP
+    const rel = block.querySelector('[name="party_relationship[]"]');
+    const relDesc = block.querySelector(
+      '[name="party_relationship_description[]"]',
+    );
+
+    if (shouldValidate(rel) && rel.value === "yes") {
+      if (relDesc && isVisible(relDesc) && !relDesc.value.trim()) {
+        return showError(relDesc, "Please describe relationship with party");
+      }
+    }
+
+    // DEALING
+    const deal = block.querySelector('[name="applicant_dealing_parties[]"]');
+    const dealDesc = block.querySelector(
+      '[name="applicant_dealing_parties_description[]"]',
+    );
+
+    if (shouldValidate(deal) && deal.value === "yes") {
+      if (dealDesc && isVisible(dealDesc) && !dealDesc.value.trim()) {
+        return showError(dealDesc, "Please provide dealing details");
+      }
+    }
+  }
+
+  /* =========================
+     TINYMCE REQUIRED VALIDATION
+  ========================= */
+  for (let field of form.querySelectorAll('[name="party_address[]"]')) {
+    if (!shouldValidate(field)) continue;
+
+    let content = "";
+
+    // 🔥 Get content from TinyMCE editor instance
+    if (typeof tinymce !== "undefined") {
+      const editor = tinymce.get(field.id);
+
+      if (editor) {
+        content = editor.getContent({ format: "text" }).trim();
+      } else {
+        // fallback (if editor not initialized)
+        content = field.value.trim();
+      }
+    }
+
+    if (!content) {
+      return showError(field, "Please enter party address");
+    }
+  }
+
+  return true;
+}
+
+/* =========================
+   SUBMIT
+========================= */
+function generateKey(prefix) {
+  return `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+}
+
+function createPayload() {
+  const properties = [];
+  const files = [];
+
+  if (window.tinymce) {
+    tinymce.triggerSave();
+  }
+
+  document.querySelectorAll(".property-block").forEach((block) => {
+    /* ================= DISPOSAL FILE ================= */
+    const fileInput = block.querySelector(
+      '[name="disposal_property_attachment[]"]',
+    );
+
+    let disposalFileKey = null;
+
+    if (fileInput?.files?.length > 0) {
+      const file = fileInput.files[0];
+      disposalFileKey = generateKey("disposal");
+
+      files.push({
+        key: disposalFileKey,
+        file: file,
+      });
+    } else if (fileInput?.dataset?.existingFileKey) {
+      disposalFileKey = fileInput.dataset.existingFileKey;
+    }
+
+    const property = {
+      property_location:
+        block.querySelector('[name="property_location[]"]')?.value || "",
+
+      property_description:
+        block.querySelector('[name="property_description[]"]')?.value || "",
+
+      property_hold:
+        block.querySelector('[name="property_hold[]"]')?.value || "",
+
+      property_price:
+        parseFloat(block.querySelector('[name="property_price[]"]')?.value) ||
+        0,
+
+      disposal_property:
+        block.querySelector('[name="disposal_property[]"]')?.value || "",
+
+      disposal_property_reason:
+        block.querySelector('[name="disposal_property_reason[]"]')?.value || "",
+
+      disposal_property_attachment: disposalFileKey,
+
+      party_name: block.querySelector('[name="party_name[]"]')?.value || "",
+
+      party_address:
+        block.querySelector('[name="party_address[]"]')?.value || "",
+
+      party_relationship:
+        block.querySelector('[name="party_relationship[]"]')?.value || "",
+
+      party_relationship_description:
+        block.querySelector('[name="party_relationship_description[]"]')
+          ?.value || "",
+
+      applicant_dealing_parties:
+        block.querySelector('[name="applicant_dealing_parties[]"]')?.value ||
+        "",
+
+      applicant_dealing_parties_description:
+        block.querySelector('[name="applicant_dealing_parties_description[]"]')
+          ?.value || "",
+
+      party_transaction_mode:
+        block.querySelector('[name="party_transaction_mode[]"]')?.value || "",
+
+      applicants: [],
+      sources: [],
+    };
+
+    /* ================= APPLICANTS ================= */
+    block.querySelectorAll(".row-item-applicant").forEach((row) => {
+      const name = row.querySelector('[name="name_applicant[]"]')?.value;
+      const interest = row.querySelector(
+        '[name="interest_applicant[]"]',
+      )?.value;
+      const relationship = row.querySelector(
+        '[name="relationship_applicant[]"]',
+      )?.value;
+
+      if (!name && !interest && !relationship) return;
+
+      property.applicants.push({
+        name: name || "",
+        interest: parseFloat(interest) || 0,
+        relationship: relationship || "",
+      });
+    });
+
+    /* ================= SOURCES (FIXED) ================= */
+    block.querySelectorAll(".row-item-source").forEach((row) => {
+      const name = row.querySelector('[name="source_name[]"]')?.value;
+      const amountVal = row.querySelector('[name="source_amount[]"]')?.value;
+      const amount = parseFloat(amountVal);
+
+      const fileInput = row.querySelector('[name="source_document[]"]');
+
+      let fileKey = null;
+
+      if (fileInput?.files?.length > 0) {
+        const file = fileInput.files[0];
+        fileKey = generateKey("source");
+
+        files.push({
+          key: fileKey,
+          file: file,
+        });
+      } else if (fileInput?.dataset?.existingFileKey) {
+        fileKey = fileInput.dataset.existingFileKey;
+      }
+
+      if (!name && !amountVal && !fileKey) return;
+
+      property.sources.push({
+        name: name || "",
+        amount: !isNaN(amount) ? amount : 0,
+        file_key: fileKey,
+      });
+    });
+
+    properties.push(property);
+  });
+
+  return { properties, files };
+}
+
+function openConfirmModal(message, onConfirm) {
+  const modalEl = document.getElementById("confirmModal");
+  const messageEl = document.getElementById("confirmMessage");
+  const okBtn = document.getElementById("confirmOkBtn");
+
+  messageEl.textContent = message;
+
+  const modal = new bootstrap.Modal(modalEl);
+  modal.show();
+
+  // Remove old listeners (VERY IMPORTANT)
+  const newOkBtn = okBtn.cloneNode(true);
+  okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+
+  // Add new click event
+  newOkBtn.addEventListener("click", () => {
+    modal.hide();
+    onConfirm(); // execute callback
+  });
+}
+
+function getEditFormId() {
+  if (window.__editFormData?.id) return String(window.__editFormData.id);
+  const params = new URLSearchParams(window.location.search);
+  return params.get("id");
+}
+
+function fillPropertyBlock(block, property) {
+  if (!block || !property) return;
+
+  const setValue = (selector, value) => {
+    const field = block.querySelector(selector);
+    if (!field || value === null || value === undefined) return;
+    field.value = value;
+    field.dispatchEvent(new Event("change", { bubbles: true }));
+  };
+
+  setValue('[name="property_location[]"]', property.property_location);
+  setValue('[name="property_description[]"]', property.property_description);
+  setValue('[name="property_hold[]"]', property.property_hold);
+  setValue('[name="property_price[]"]', property.property_price);
+  setValue('[name="disposal_property[]"]', property.disposal_property);
+  setValue(
+    '[name="disposal_property_reason[]"]',
+    property.disposal_property_reason,
+  );
+  setValue('[name="party_name[]"]', property.party_name);
+  setValue('[name="party_relationship[]"]', property.party_relationship);
+  setValue(
+    '[name="party_relationship_description[]"]',
+    property.party_relationship_description,
+  );
+  setValue(
+    '[name="applicant_dealing_parties[]"]',
+    property.applicant_dealing_parties,
+  );
+  setValue(
+    '[name="applicant_dealing_parties_description[]"]',
+    property.applicant_dealing_parties_description,
+  );
+  setValue('[name="nature_dealing_party[]"]', property.nature_dealing_party);
+  setValue(
+    '[name="party_transaction_mode[]"]',
+    property.party_transaction_mode,
+  );
+
+  // Existing disposal attachment link (edit mode)
+  const disposalInput = block.querySelector(
+    '[name="disposal_property_attachment[]"]',
+  );
+  const disposalLinkWrap = block.querySelector(
+    ".js-existing-disposal-attachment",
+  );
+  if (disposalInput) {
+    delete disposalInput.dataset.existingFileKey;
+  }
+  if (disposalLinkWrap) {
+    disposalLinkWrap.classList.add("d-none");
+    disposalLinkWrap.innerHTML = "";
+  }
+  if (property.disposal_attachment?.download_url && disposalInput) {
+    disposalInput.dataset.existingFileKey =
+      property.disposal_attachment.file_key || "";
+    if (disposalLinkWrap) {
+      const url = property.disposal_attachment.download_url;
+      const name =
+        property.disposal_attachment.file_name || "Download attachment";
+      disposalLinkWrap.innerHTML = `<a href="${url}" target="_blank" rel="noopener"> ${name}</a>`;
+      disposalLinkWrap.classList.remove("d-none");
+    }
+  }
+
+  const partyAddress = block.querySelector('[name="party_address[]"]');
+  if (
+    partyAddress &&
+    property.party_address !== null &&
+    property.party_address !== undefined
+  ) {
+    partyAddress.value = property.party_address;
+    if (typeof tinymce !== "undefined" && tinymce.get(partyAddress.id)) {
+      tinymce.get(partyAddress.id).setContent(property.party_address || "");
+    }
+  }
+
+  if (Array.isArray(property.applicants) && property.applicants.length) {
+    const addApplicantBtn = block.querySelector(".addRow_applicant");
+    for (let i = 1; i < property.applicants.length; i++) {
+      addApplicantBtn?.click();
+    }
+
+    const applicantRows = block.querySelectorAll(".row-item-applicant");
+    property.applicants.forEach((applicant, idx) => {
+      const row = applicantRows[idx];
+      if (!row) return;
+      const name = row.querySelector('[name="name_applicant[]"]');
+      const interest = row.querySelector('[name="interest_applicant[]"]');
+      const rel = row.querySelector('[name="relationship_applicant[]"]');
+      if (name) name.value = applicant.name || "";
+      if (interest) interest.value = applicant.interest || "";
+      if (rel) rel.value = applicant.relationship || "";
+    });
+  }
+
+  if (Array.isArray(property.sources) && property.sources.length) {
+    const addSourceBtn = block.querySelector(".addRow_source");
+    for (let i = 1; i < property.sources.length; i++) {
+      addSourceBtn?.click();
+    }
+
+    const sourceRows = block.querySelectorAll(".row-item-source");
+    property.sources.forEach((source, idx) => {
+      const row = sourceRows[idx];
+      if (!row) return;
+      const sourceName = row.querySelector('[name="source_name[]"]');
+      const sourceAmount = row.querySelector('[name="source_amount[]"]');
+      const sourceFile = row.querySelector('[name="source_document[]"]');
+      const linkWrap = row.querySelector(".js-existing-source-attachment");
+      if (sourceName) sourceName.value = source.name || "";
+      if (sourceAmount) sourceAmount.value = source.amount || "";
+
+      if (sourceFile) {
+        delete sourceFile.dataset.existingFileKey;
+      }
+      if (linkWrap) {
+        linkWrap.classList.add("d-none");
+        linkWrap.innerHTML = "";
+      }
+      if (source?.attachment?.download_url && sourceFile) {
+        sourceFile.dataset.existingFileKey = source.attachment.file_key || "";
+        if (linkWrap) {
+          const url = source.attachment.download_url;
+          const name = source.attachment.file_name || "Download attachment";
+          linkWrap.innerHTML = `<a href="${url}" target="_blank" rel="noopener">Existing file: ${name}</a>`;
+          linkWrap.classList.remove("d-none");
+        }
+      }
+    });
+  }
+}
+
+function hydrateForm1ForEdit() {
+  const form = document.getElementById("form1");
+  const data = window.__editFormData;
+  const ft = String(data?.form_type || "").toLowerCase();
+  if (!form || !data || ft !== "immovable") return;
+
+  const propertyList = Array.isArray(data.properties)
+    ? data.properties
+    : Array.isArray(data.propertyDetails)
+      ? data.propertyDetails
+      : [];
+
+  const setMainValue = (name, value) => {
+    const field = form.querySelector(`[name="${name}"]`);
+    if (!field || value === null || value === undefined) return;
+    field.value = value;
+    field.dispatchEvent(new Event("change", { bubbles: true }));
+  };
+
+  setMainValue("purpose", data.purpose);
+  setMainValue("acquired_disposed", data.acquired_disposed);
+  setMainValue("date_acquisition_disposed", data.date_acquisition_disposed);
+  setMainValue("mode_acquisition", data.mode_acquisition);
+  setMainValue("mode_acquisition_other", data.mode_acquisition_other);
+  setMainValue("mode_disposal", data.mode_disposal);
+  setMainValue("mode_disposal_other", data.mode_disposal_other);
+  setMainValue("acquisition_gift", data.acquisition_gift);
+  setMainValue("other_relevant", data.other_relevant);
+
+  if (propertyList.length) {
+    window.__isHydratingEdit = true;
+    try {
+      // Ensure block count matches API payload count before filling values.
+      let safety = 0;
+      while (
+        form.querySelectorAll(".property-block").length < propertyList.length &&
+        safety < propertyList.length + 5
+      ) {
+        const beforeCount = form.querySelectorAll(".property-block").length;
+        if (typeof window.__appendPropertyBlockForm1 === "function") {
+          window.__appendPropertyBlockForm1();
+        }
+        const afterCount = form.querySelectorAll(".property-block").length;
+        if (afterCount <= beforeCount) break;
+        safety++;
+      }
+
+      propertyList.forEach((property, idx) => {
+        const blocks = form.querySelectorAll(".property-block");
+        const currentBlock = blocks[idx];
+        if (!currentBlock) return;
+
+        fillPropertyBlock(currentBlock, property);
+      });
+    } finally {
+      window.__isHydratingEdit = false;
+    }
+
+    // TinyMCE may finish initializing after fill; sync rich-text party address again.
+    setTimeout(() => {
+      propertyList.forEach((property, idx) => {
+        const blocks = form.querySelectorAll(".property-block");
+        const block = blocks[idx];
+        if (!block || property.party_address == null) return;
+        const partyAddress = block.querySelector('[name="party_address[]"]');
+        if (
+          partyAddress &&
+          typeof tinymce !== "undefined" &&
+          tinymce.get(partyAddress.id)
+        ) {
+          tinymce.get(partyAddress.id).setContent(property.party_address || "");
+        }
+      });
+    }, 200);
+  }
+}
+
+function submitForm() {
+  if (typeof tinymce !== "undefined") {
+    tinymce.triggerSave();
+  }
+
+  if (!validateForm()) return;
+
+  // OPEN MODAL INSTEAD OF confirm()
+  openConfirmModal("Are you sure you want to submit the form?", async () => {
+    const form = document.getElementById("form1");
+
+    const { properties, files } = createPayload();
+
+    const formData = new FormData(form);
+
+    formData.append("propertyDetails", JSON.stringify(properties));
+
+    files.forEach((f) => {
+      formData.append(f.key, f.file);
+    });
+
+    formData.append("uid", sessionStorage.getItem("uid"));
+    formData.append("form_type", "immovable");
+    formData.append("form_status", 1);
+    const editFormId = getEditFormId();
+    if (editFormId) {
+      formData.append("form_id", editFormId);
+    }
+
+    try {
+      const res = await fetch("api/submit_form.php", {
+        method: "POST",
+        body: formData,
+      });
+
+      const json = await res.json();
+
+      if (json.success) {
+        showAlert("Form submitted successfully!", "success");
+        setTimeout(() => {
+          location.reload();
+        }, 3000);
+      } else {
+        showAlert("Form submission failed!", "danger");
+        alert(json.message || "Submission failed");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server error");
+    }
+  });
+}
+
+function saveDraft() {
+  if (typeof tinymce !== "undefined") {
+    tinymce.triggerSave();
+  }
+
+  const form = document.getElementById("form1");
+  if (!form) {
+    alert("Form not found");
+    return;
+  }
+
+  const acquiredDisposedField =
+    form.querySelector('[name="acquired_disposed"]') ||
+    document.getElementById("acquired_hidden");
+  const acquiredDisposedValue = (acquiredDisposedField?.value || "").trim();
+
+  const purposeField = form.querySelector('[name="purpose"]');
+  const purposeValue = (purposeField?.value || "").trim();
+  if (!purposeValue) {
+    showError(
+      purposeField || form,
+      "Please select purpose and Acquired/Disposed before saving draft.",
+    );
+    return;
+  }
+
+  if (!acquiredDisposedValue) {
+    showError(
+      acquiredDisposedField || form,
+      "Please select Acquired/Disposed before saving draft.",
+    );
+    return;
+  }
+
+  openConfirmModal(
+    "Are you sure you want to save this form as a draft?",
+    async () => {
+      const { properties, files } = createPayload();
+      const formData = new FormData(form);
+
+      formData.append("propertyDetails", JSON.stringify(properties));
+
+      files.forEach((f) => {
+        formData.append(f.key, f.file);
+      });
+
+      formData.append("uid", sessionStorage.getItem("uid"));
+      formData.append("form_type", "immovable");
+      formData.append("form_status", 0);
+      const editFormId = getEditFormId();
+      if (editFormId) {
+        formData.append("form_id", editFormId);
+      }
+
+      try {
+        const res = await fetch("api/submit_form.php", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!res.ok) {
+          throw new Error(`Request failed with status ${res.status}`);
+        }
+
+        const json = await res.json();
+
+        if (json.success) {
+          showAlert("Draft saved successfully!", "success");
+          setTimeout(() => {
+            const url = new URL(window.location.href);
+            url.searchParams.delete("id");
+            window.location.href = `${url.pathname}${url.search}${url.hash}`;
+          }, 3000);
+        } else {
+          const errorMessage =
+            json.message || json.error || "Draft could not be saved";
+          showAlert(errorMessage, "danger");
+          alert(errorMessage);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Server error while saving draft");
+      }
+    },
+  );
+}

@@ -1,5 +1,3 @@
-        <!-- =============================================== -->
-
         <!-- Left side column. contains the sidebar -->
         <aside class="main-sidebar">
             <!-- sidebar: style can be found in sidebar.less -->
@@ -41,7 +39,7 @@
                                     <li><a href="movableForm.php"><i class="fa fa-circle-o"></i> Movable</a></li>
                                 </ul>
                             </li>
-                            <li><a href="#"><i class="fa fa-circle-o"></i>Request Lists</a></li>
+                            <li><a href="requestLists.php"><i class="fa fa-circle-o"></i>Request Lists</a></li>
                         </ul>
                     </li>
                 </ul>

@@ -20,23 +20,23 @@
             <!-- Content Header (Page header) -->
             <section class="content-header">
                 <h1>
-                    Movable Property
+                    View Movable Property
                 </h1>
                 <ol class="breadcrumb">
                     <li><a href="dashboard.php"><i class="fa fa-dashboard"></i> Home</a></li>
-                    <li>New Request</li>
-                    <li class="active">Movable property</li>
+                    <li>Property</li>
+                    <li class="active">View Movable property</li>
                 </ol>
             </section>
 
             <!-- Main content -->
             <section class="content">
-                <form id="form2" role="form" novalidate enctype="multipart/form-data">
+                <form id="form1" role="form" novalidate enctype="multipart/form-data">
 
                     <!-- Header -->
                     <div class="text-center" style="margin-bottom:15px;">
-                        <h5 class="fw-bold text-uppercase">Property transaction for movable property</h5>
-                        <small class="text-muted">(Prior intimation / Seeking sanction under Rule 18 (3) of the CCS (Conduct) Rules, 1964)</small>
+                        <h4 class="text-uppercase"><b>Property transaction for immovable property</b></h4>
+                        <small>(Prior intimation / Seeking sanction under Rule 18 (2) of the CCS (Conduct) Rules, 1964)</small>
                     </div>
 
                     <!-- Main Box -->
@@ -60,11 +60,11 @@
                                 <!-- Acquired / Disposed -->
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label class="required-label">Acquisition or Disposal</label>
+                                        <label class="required-label">Acquired or Disposed</label>
                                         <select name="acquired_disposed" class="form-control" required>
                                             <option value="">Select...</option>
-                                            <option value="acquisition">Acquisition</option>
-                                            <option value="disposal">Disposal</option>
+                                            <option value="acquired">Acquired</option>
+                                            <option value="disposed">Disposed</option>
                                         </select>
                                     </div>
                                 </div>
@@ -127,15 +127,48 @@
 
                                 <div class="row">
 
+                                    <!-- Location -->
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="required-label">Full Location Details <i class="fa fa-info-circle text-primary" title="Municipal No, Street, Village, Taluka, District, State"></i></label>
+                                            <input type="text" name="property_location[]" class="form-control allow-basic" required>
+                                        </div>
+                                    </div>
+
                                     <!-- Type -->
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label class="required-label">
-                                                Details of Property
-                                                <i class="fa fa-info-circle text-primary"
-                                                    title="Make, model and registration no. in case of vehicle"></i>
-                                            </label>
-                                            <textarea class="form-control allow-basic" rows="1" name="property_description[]" required></textarea>
+                                            <label class="required-label">Description Type</label>
+                                            <select name="property_description[]" class="form-control" required>
+                                                <option value="">Select...</option>
+                                                <option value="Housing and Other buildings">Housing and Other buildings</option>
+                                                <option value="Lands">Lands</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Hold -->
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="required-label">Freehold or Leasehold</label>
+                                            <select name="property_hold[]" class="form-control" required>
+                                                <option value="">Select...</option>
+                                                <option value="freehold">Freehold</option>
+                                                <option value="leasehold">Leasehold</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <!--./row-->
+
+                                <div class="row">
+                                    <!-- Price -->
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="required-label property_price_label">Sale/purchase price of the property (in Rupees) </label>
+                                            <input inputmode="numeric" pattern="[0-9]*" name="property_price[]" class="form-control property_price amount-input" required>
+                                            <small class="price_in_text text-success fw-bold"></small>
                                         </div>
                                     </div>
 
@@ -186,18 +219,7 @@
 
                                         </div>
                                     </div>
-
-
-                                    <!-- Price -->
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label class="required-label property_price_label">Sale/purchase price of the property (in Rupees) </label>
-                                            <input inputmode="numeric" pattern="[0-9]*" name="property_price[]" class="form-control property_price amount-input" required>
-                                            <small class="price_in_text text-success fw-bold"></small>
-                                        </div>
-                                    </div>
                                 </div>
-                                <!--./row-->
 
                                 <!-- Sources of Financing -->
                                 <div class="d-none acquisition_sources">
@@ -301,9 +323,8 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="required-label">Address of Party</label>
-                                                <textarea class="form-control allow-basic party_address editor"
-                                                    name="party_address[]" rows="2"
-                                                    data-editor="tinymce" required></textarea>
+                                                <textarea class="form-control allow-basic party_address"
+                                                    name="party_address[]" rows="2" required></textarea>
                                             </div>
                                         </div>
 
@@ -325,7 +346,7 @@
 
                                         <div class="col-md-8 party_relationship_description  d-none">
                                             <div class="form-group">
-                                                <label class="required-label"></label>
+                                                <label class="required-label">Describe relationship</label>
                                                 <input type="text"
                                                     class="form-control allow-basic"
                                                     name="party_relationship_description[]"
@@ -351,7 +372,7 @@
 
                                         <div class="col-md-8 applicant_dealing_parties_description d-none">
                                             <div class="form-group">
-                                                <label class="required-label"></label>
+                                                <label class="required-label">Full particulars about the official dealing with parties</label>
                                                 <input type="text"
                                                     class="form-control allow-basic"
                                                     name="applicant_dealing_parties_description[]"
@@ -363,12 +384,6 @@
 
                                     <!-- Transaction Mode -->
                                     <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label class="required-label">Nature of official dealing with the party</label>
-                                                <input type="text" class="form-control allow-basic" name="nature_dealing_party[]" required>
-                                            </div>
-                                        </div>
 
                                         <div class="col-md-4">
                                             <div class="form-group">
@@ -408,7 +423,7 @@
                             <div class="row" style="margin-top:20px;">
 
                                 <!-- Acquisition Gift -->
-                                <div class="col-md-6 d-none" id="acquisition_gift_form2">
+                                <div class="col-md-6 d-none" id="acquisition_gift">
                                     <div class="form-group">
                                         <label class="required-label">Sanction required under rule 13 of CCS Rules</label>
                                         <select class="form-control" name="acquisition_gift">
@@ -434,27 +449,27 @@
                                 <div class="box-body">
 
                                     <!-- In Parts -->
-                                    <div class="d-none" id="form2_inparts">
+                                    <div class="d-none" id="form1_inparts">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" name="form2_dec" required>
-                                                I, <strong class="emp_name_text"></strong> hereby declare that the particulars given above are true.
-                                                I request that I may be given permission to
-                                                <span class="acquired_disposed_value"></span>
-                                                the property as described above from/to
-                                                <strong class="party_name_text"></strong>,
-                                                whose name is mentioned in details of the Parties.
+                                                <input type="checkbox" name="form1_dec" required>
+                                                I, <strong class="emp_name_text underline"></strong> hereby declare that the particulars given above are true.
+                                                I request permission to
+                                                <span class="acquired_disposed_value text-primary"></span>
+                                                the property from/to
+                                                <strong class="party_name_text underline"></strong>.
                                             </label>
                                         </div>
                                     </div>
 
-                                    <div class="d-none" id="form2_full">
+                                    <!-- Full -->
+                                    <div class="d-none" id="form1_full">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" name="form2_dec1" required>
-                                                I, <strong class="emp_name_text"></strong> hereby intimate the proposed
-                                                <span class="acquisition_disposed_value"></span>
-                                                of property by me as detailed above. I declare that the particulars given above are true.
+                                                <input type="checkbox" name="form1_dec1" required>
+                                                I, <strong class="emp_name_text underline"></strong> hereby intimate the proposed
+                                                <span class="acquisition_disposed_value text-primary"></span>
+                                                of property by me. I declare that the particulars given above are true.
                                             </label>
                                         </div>
                                     </div>
@@ -478,8 +493,9 @@
         <!-- /.content-wrapper -->
     </div>
     <!-- ./wrapper -->
+
     <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-dialog" role="document">
             <div class="modal-content">
 
                 <!-- Header -->
@@ -508,9 +524,9 @@
         </div>
     </div>
 
-
     <?php require 'footer.php'; ?>
-    <script src="../js/movable.js"></script>
+    <script src="../js/immovable.js"></script>
+
 </body>
 
 </html>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>AdminLTE 2 | Log in</title>
+    <title>eForms</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
@@ -33,6 +33,22 @@
         <!-- /.login-logo -->
         <div class="login-box-body">
             <p class="login-box-msg">Sign in to start your session</p>
+
+            <!-- Session timeout message -->
+            <?php if (isset($_GET['timeout'])): ?>
+                <div class="alert alert-warning alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <strong>Session Expired!</strong> Your session has expired due to inactivity. Please login again.
+                </div>
+            <?php endif; ?>
+
+            <!-- Unauthorized access message -->
+            <?php if (isset($_GET['unauthorized'])): ?>
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <strong>Unauthorized!</strong> Your session is invalid or has expired. Please login again.
+                </div>
+            <?php endif; ?>
 
             <form id="loginForm" novalidate>
                 <div class="form-group has-feedback">
@@ -75,6 +91,66 @@
     <!-- iCheck -->
     <script src="plugins/iCheck/icheck.min.js"></script>
     <script>
+        // Session timeout configuration (in milliseconds)
+        const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+        const WARNING_TIME = 25 * 60 * 1000;   // Warn at 25 minutes
+        let logoutTimer;
+        let warningTimer;
+
+        // Initialize - clear any stale sessions
+        (function init() {
+            sessionStorage.clear();
+            localStorage.removeItem('sessionWarned');
+        })();
+
+        // Function to reset inactivity timers
+        function resetActivityTimer() {
+            clearTimeout(logoutTimer);
+            clearTimeout(warningTimer);
+            localStorage.removeItem('sessionWarned');
+
+            // Set warning timer
+            warningTimer = setTimeout(() => {
+                showSessionWarning();
+            }, WARNING_TIME);
+
+            // Set logout timer
+            logoutTimer = setTimeout(() => {
+                logoutUser();
+            }, SESSION_TIMEOUT);
+        }
+
+        // Show session warning
+        function showSessionWarning() {
+            if (localStorage.getItem('sessionWarned') !== 'true') {
+                const warning = confirm('⚠️ Your session will expire in 5 minutes due to inactivity.\n\nClick OK to continue working.');
+                if (warning) {
+                    localStorage.setItem('sessionWarned', 'true');
+                    resetActivityTimer();
+                } else {
+                    logoutUser();
+                }
+            }
+        }
+
+        // Logout user and redirect
+        function logoutUser() {
+            sessionStorage.clear();
+            fetch('api/logout.php').catch(() => {
+                // Continue even if API call fails
+            }).finally(() => {
+                location.href = 'index.php?timeout=1';
+            });
+        }
+
+        // Track user activity
+        document.addEventListener('mousemove', resetActivityTimer);
+        document.addEventListener('keypress', resetActivityTimer);
+        document.addEventListener('click', resetActivityTimer);
+        document.addEventListener('scroll', resetActivityTimer);
+        document.addEventListener('touchstart', resetActivityTimer);
+
+        // Form submission handler
         document.getElementById("loginForm").addEventListener("submit", async (e) => {
             e.preventDefault();
             let form = new FormData(e.target);
@@ -99,6 +175,10 @@
                 sessionStorage.setItem("empCode", json.empcode);
                 sessionStorage.setItem("service", json.service);
                 sessionStorage.setItem("payscale", json.payscale);
+                
+                // Start session timeout tracking
+                resetActivityTimer();
+                
                 setTimeout(() => {
                     if (json.designation === 'SO') {
                         location.href = "pages/submitted_form_list.php";
@@ -115,9 +195,6 @@
                     `<div class='alert alert-danger'>${json.message}</div>`;
             }
         });
-        (async function init() {
-            sessionStorage.clear();
-        })();
     </script>
 </body>
 

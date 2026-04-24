@@ -1,3 +1,4 @@
+<?php require '../connection/session_check.php'; ?>
 <!DOCTYPE html>
 <html>
 

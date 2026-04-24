@@ -1,6 +1,33 @@
-document.addEventListener("DOMContentLoaded", function () {
-  initTinyMCE();
+document.addEventListener("DOMContentLoaded", async function () {
+  const params = new URLSearchParams(window.location.search);
+  const editId = params.get("id");
+
+  try {
+    if (editId) {
+      const res = await fetch("../api/getDataById.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: editId }),
+      });
+
+      const json = await res.json();
+
+      if (json.success && json.data) {
+        window.__editFormData = json.data;
+      }
+    }
+  } catch (err) {
+    console.error("Edit load error:", err);
+  }
+
   initForm2();
+
+  if (typeof hydrateForm2ForEdit === "function") {
+    hydrateForm2ForEdit();
+  }
+
   updatePropertyButtons();
   toggleAcquiredDisposed();
 });
@@ -38,13 +65,7 @@ function initForm2() {
     const currentBlock = blocks[blocks.length - 1];
     if (!currentBlock) return null;
 
-    if (typeof tinymce !== "undefined") {
-      tinymce.remove();
-    }
-
     const clone = currentBlock.cloneNode(true);
-    clone.querySelectorAll(".tox-tinymce").forEach((el) => el.remove());
-
     clone.querySelectorAll("textarea").forEach((el, index) => {
       el.value = "";
       el.id = "editor_" + Date.now() + "_" + index;
@@ -369,9 +390,6 @@ function initForm2() {
 
       const currentBlock = e.target.closest(".property-block");
 
-      if (!isHydratingEdit && typeof tinymce !== "undefined") {
-        tinymce.triggerSave();
-      }
       if (!isHydratingEdit) {
         clearErrors();
       }
@@ -524,15 +542,7 @@ function initForm2() {
         CLONE BLOCK
       ========================= */
 
-      //  DESTROY existing editors BEFORE cloning
-      if (typeof tinymce !== "undefined") {
-        tinymce.remove();
-      }
-
       const clone = currentBlock.cloneNode(true);
-
-      //  REMOVE TinyMCE UI (VERY IMPORTANT)
-      clone.querySelectorAll(".tox-tinymce").forEach((el) => el.remove());
 
       clone.querySelectorAll("textarea").forEach((el, index) => {
         el.value = "";
@@ -631,9 +641,6 @@ function initForm2() {
       currentBlock.after(clone);
       updatePropertyButtons();
       toggleAcquiredDisposed();
-
-      // RE-INITIALIZE TinyMCE CLEANLY
-      initTinyMCE();
 
       if (!isHydratingEdit) {
         clone.scrollIntoView({ behavior: "smooth" });
@@ -954,41 +961,38 @@ function initForm2() {
 
 function showConfirm(message) {
   return new Promise((resolve) => {
-    const modalEl = document.getElementById("confirmModal");
-    const messageEl = document.getElementById("confirmMessage");
-    const okBtn = document.getElementById("confirmOkBtn");
-    const cancelBtn = document.getElementById("confirmCancelBtn");
+    const $modal = $("#confirmModal");
+    const $message = $("#confirmMessage");
+    const $okBtn = $("#confirmOkBtn");
+    const $cancelBtn = $("#confirmCancelBtn");
 
-    messageEl.textContent = message;
+    $message.text(message);
 
-    const modal = new bootstrap.Modal(modalEl);
-    modal.show();
-
-    // Focus CANCEL by default
-    modalEl.addEventListener(
-      "shown.bs.modal",
-      () => {
-        cancelBtn.focus();
-      },
-      { once: true },
-    );
+    let resolved = false;
 
     function cleanup(result) {
-      modal.hide();
+      if (resolved) return;
+      resolved = true;
+
+      $modal.modal("hide");
       resolve(result);
     }
 
-    okBtn.onclick = () => cleanup(true);
-    cancelBtn.onclick = () => cleanup(false);
+    // Remove old handlers to avoid stacking
+    $okBtn.off("click").on("click", () => cleanup(true));
+    $cancelBtn.off("click").on("click", () => cleanup(false));
 
-    // Handle close (X button / backdrop click)
-    modalEl.addEventListener(
-      "hidden.bs.modal",
-      () => {
-        resolve(false);
-      },
-      { once: true },
-    );
+    // Focus cancel button when modal opens
+    $modal.off("shown.bs.modal").on("shown.bs.modal", function () {
+      $cancelBtn.focus();
+    });
+
+    // Handle close (X / backdrop / ESC)
+    $modal.off("hidden.bs.modal").on("hidden.bs.modal", function () {
+      cleanup(false);
+    });
+
+    $modal.modal("show");
   });
 }
 
@@ -1062,53 +1066,6 @@ function updatePropertyButtons() {
     if (blocks.length === 1 && removeBtn) {
       removeBtn.style.display = "none";
     }
-  });
-}
-
-/* =========================
-   TINYMCE
-========================= */
-function initTinyMCE() {
-  if (typeof tinymce === "undefined") return Promise.resolve();
-
-  //  Save content before removing editors
-  tinymce.triggerSave();
-
-  //  Remove existing editors safely
-  tinymce.remove(".party_address");
-
-  //  Assign UNIQUE IDs (important for cloned blocks)
-  document.querySelectorAll("textarea.party_address").forEach((el, i) => {
-    if (!el.id) {
-      el.id = "party_address_" + Date.now() + "_" + i;
-    }
-  });
-
-  //  Initialize editors (returns Promise in TinyMCE 6+)
-  return tinymce.init({
-    selector: "textarea.party_address",
-    license_key: "gpl",
-    menubar: false,
-    toolbar: false,
-    statusbar: false,
-    height: 70,
-    resize: false,
-    branding: false,
-    content_style: "body { min-height:70px; margin:5px; }",
-    setup: function (editor) {
-      editor.on("input keyup change", function () {
-        const textarea = document.getElementById(editor.id);
-
-        if (textarea) {
-          textarea.classList.remove("is-invalid");
-        }
-
-        const container = editor.getContainer();
-        if (container) {
-          container.classList.remove("tinymce-error");
-        }
-      });
-    },
   });
 }
 
@@ -1230,8 +1187,6 @@ function shouldValidate(field) {
 
   if (field.disabled) return false;
 
-  if (field.classList.contains("tinymce-editor")) return true;
-
   if (!isVisible(field)) return false;
 
   if (field.closest(".d-none")) return false;
@@ -1246,27 +1201,6 @@ function showError(field, message) {
 
   field.classList.add("is-invalid");
 
-  if (typeof tinymce !== "undefined") {
-    const editor = tinymce.get(field.id);
-
-    if (editor) {
-      // Focus correctly
-      setTimeout(() => {
-        editor.focus();
-      }, 100);
-
-      // Add border to correct element
-      const container = editor.getContainer();
-      if (container) {
-        container.classList.add("tinymce-error");
-      }
-    } else {
-      field.focus();
-    }
-  } else {
-    field.focus();
-  }
-
   field.scrollIntoView({ behavior: "smooth", block: "center" });
 
   showAlert(message, "danger");
@@ -1277,11 +1211,6 @@ function clearErrors() {
   document.querySelectorAll(".is-invalid").forEach((el) => {
     el.classList.remove("is-invalid");
   });
-
-  // remove TinyMCE borders
-  document.querySelectorAll(".tox-tinymce").forEach((el) => {
-    el.classList.remove("tinymce-error");
-  });
 }
 
 function isVisible(el) {
@@ -1290,10 +1219,6 @@ function isVisible(el) {
 
 function validateForm() {
   const form = document.getElementById("form2");
-
-  if (typeof tinymce !== "undefined") {
-    tinymce.triggerSave();
-  }
 
   clearErrors();
 
@@ -1311,10 +1236,7 @@ function validateForm() {
       continue;
     }
 
-    // required (skip TinyMCE)
     if (field.required) {
-      if (field.classList.contains("tinymce-editor")) continue;
-
       if (!field.value || field.value.trim() === "") {
         console.log(field.name);
         return showError(field, "Please fill the required field");
@@ -1458,31 +1380,6 @@ function validateForm() {
     }
   }
 
-  /* =========================
-     TINYMCE REQUIRED VALIDATION
-  ========================= */
-  for (let field of form.querySelectorAll('[name="party_address[]"]')) {
-    if (!shouldValidate(field)) continue;
-
-    let content = "";
-
-    // 🔥 Get content from TinyMCE editor instance
-    if (typeof tinymce !== "undefined") {
-      const editor = tinymce.get(field.id);
-
-      if (editor) {
-        content = editor.getContent({ format: "text" }).trim();
-      } else {
-        // fallback (if editor not initialized)
-        content = field.value.trim();
-      }
-    }
-
-    if (!content) {
-      return showError(field, "Please enter party address");
-    }
-  }
-
   return true;
 }
 
@@ -1495,11 +1392,6 @@ function generateKey(prefix) {
 function createPayload() {
   const properties = [];
   const files = [];
-
-  // sync TinyMCE
-  if (window.tinymce) {
-    tinymce.triggerSave();
-  }
 
   document.querySelectorAll(".property-block").forEach((block, pIndex) => {
     /* ================= DISPOSAL FILE ================= */
@@ -1624,26 +1516,21 @@ function createPayload() {
 }
 
 function openConfirmModal(message, onConfirm) {
-  const modalEl = document.getElementById("confirmModal");
-  const messageEl = document.getElementById("confirmMessage");
+  const modal = $("#confirmModal");
+  $("#confirmMessage").text(message);
+
+  modal.modal("show");
+
   const okBtn = document.getElementById("confirmOkBtn");
 
-  messageEl.textContent = message;
-
-  const modal = new bootstrap.Modal(modalEl);
-  modal.show();
-
-  // Remove old listeners (VERY IMPORTANT)
   const newOkBtn = okBtn.cloneNode(true);
-  okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+  okBtn.replaceWith(newOkBtn);
 
-  // Add new click event
   newOkBtn.addEventListener("click", () => {
-    modal.hide();
-    onConfirm(); // execute callback
+    modal.modal("hide");
+    if (typeof onConfirm === "function") onConfirm();
   });
 }
-
 function getEditFormId() {
   if (window.__editFormData?.id) return String(window.__editFormData.id);
   const params = new URLSearchParams(window.location.search);
@@ -1680,6 +1567,7 @@ function fillPropertyBlock(block, property) {
     property.disposal_property_reason,
   );
   setValue('[name="party_name[]"]', property.party_name);
+  setValue('[name="party_address[]"]', property.party_address);
   setValue('[name="party_relationship[]"]', property.party_relationship);
   setValue(
     '[name="party_relationship_description[]"]',
@@ -1717,23 +1605,11 @@ function fillPropertyBlock(block, property) {
     disposalInput.dataset.existingFileKey =
       property.disposal_attachment.file_key || "";
     if (disposalLinkWrap) {
-      const url = property.disposal_attachment.download_url;
+      const key = property.disposal_attachment.file_key;
       const name =
         property.disposal_attachment.file_name || "Download attachment";
-      disposalLinkWrap.innerHTML = `<a href="${url}" target="_blank" rel="noopener"> ${name}</a>`;
+      disposalLinkWrap.innerHTML = `<a href="../api/view_attachement_file.php?file_key=${key}" target="_blank" rel="noopener"> ${name}</a>`;
       disposalLinkWrap.classList.remove("d-none");
-    }
-  }
-
-  const partyAddress = block.querySelector('[name="party_address[]"]');
-  if (
-    partyAddress &&
-    property.party_address !== null &&
-    property.party_address !== undefined
-  ) {
-    partyAddress.value = property.party_address;
-    if (typeof tinymce !== "undefined" && tinymce.get(partyAddress.id)) {
-      tinymce.get(partyAddress.id).setContent(property.party_address || "");
     }
   }
 
@@ -1783,9 +1659,9 @@ function fillPropertyBlock(block, property) {
       if (source?.attachment?.download_url && sourceFile) {
         sourceFile.dataset.existingFileKey = source.attachment.file_key || "";
         if (linkWrap) {
-          const url = source.attachment.download_url;
+          const key = source.attachment.file_key;
           const name = source.attachment.file_name || "Download attachment";
-          linkWrap.innerHTML = `<a href="${url}" target="_blank" rel="noopener"> ${name}</a>`;
+          linkWrap.innerHTML = `<a href="../api/view_attachement_file.php?file_key=${key}" target="_blank" rel="noopener"> ${name}</a>`;
           linkWrap.classList.remove("d-none");
         }
       }
@@ -1852,30 +1728,10 @@ function hydrateForm2ForEdit() {
     } finally {
       window.__isHydratingEdit = false;
     }
-
-    setTimeout(() => {
-      propertyList.forEach((property, idx) => {
-        const blocks = form.querySelectorAll(".property-block");
-        const block = blocks[idx];
-        if (!block || property.party_address == null) return;
-        const partyAddress = block.querySelector('[name="party_address[]"]');
-        if (
-          partyAddress &&
-          typeof tinymce !== "undefined" &&
-          tinymce.get(partyAddress.id)
-        ) {
-          tinymce.get(partyAddress.id).setContent(property.party_address || "");
-        }
-      });
-    }, 200);
   }
 }
 
 function submitForm() {
-  if (typeof tinymce !== "undefined") {
-    tinymce.triggerSave();
-  }
-
   if (!validateForm()) return;
   // OPEN MODAL INSTEAD OF confirm()
   openConfirmModal("Are you sure you want to submit the form?", async () => {
@@ -1892,7 +1748,6 @@ function submitForm() {
     });
 
     // main fields
-    formData.append("uid", sessionStorage.getItem("uid"));
     formData.append("form_type", "movable");
     formData.append("form_status", 1);
     const editFormId = getEditFormId();
@@ -1925,10 +1780,6 @@ function submitForm() {
 }
 
 function saveDraft() {
-  if (typeof tinymce !== "undefined") {
-    tinymce.triggerSave();
-  }
-
   const form = document.getElementById("form2");
   if (!form) {
     alert("Form not found");
@@ -1971,7 +1822,6 @@ function saveDraft() {
       });
 
       // main fields
-      formData.append("uid", sessionStorage.getItem("uid"));
       formData.append("form_type", "movable");
       formData.append("form_status", 0);
       const editFormId = getEditFormId();

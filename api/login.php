@@ -21,6 +21,7 @@ if ($user && password_verify($password, $user['password_hash'])) {
     $_SESSION['payscale'] = $user['payscale'];
     $_SESSION['address'] = $user['address'];
     $_SESSION['service'] = $user['service'];
+    $_SESSION['last_activity'] = time(); // Track session activity for auto-logout
 
     echo json_encode([
         "success" => true,

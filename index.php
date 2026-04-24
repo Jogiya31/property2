@@ -155,7 +155,6 @@
             e.preventDefault();
             let form = new FormData(e.target);
             let data = Object.fromEntries(form);
-            console.log('form', form)
             let res = await fetch("api/login.php", {
                 method: "POST",
                 headers: {
@@ -181,11 +180,11 @@
                 
                 setTimeout(() => {
                     if (json.designation === 'SO') {
-                        location.href = "pages/submitted_form_list.php";
+                        location.href = "pages/requestLists.php";
                     } else if (json.designation === 'DDG') {
-                        location.href = "pages/submitted_form_list.php";
+                        location.href = "pages/requestLists.php";
                     } else if (json.designation === 'JD') {
-                        location.href = "pages/submitted_form_list.php";
+                        location.href = "pages/requestLists.php";
                     } else {
                         location.href = "pages/dashboard.php";
                     }

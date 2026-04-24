@@ -35,78 +35,61 @@
 
                     <!-- Header -->
                     <div class="text-center" style="margin-bottom:15px;">
-                        <h4 class="text-uppercase"><b>Property transaction for immovable property</b></h4>
-                        <small>(Prior intimation / Seeking sanction under Rule 18 (2) of the CCS (Conduct) Rules, 1964)</small>
+                        <p style="text-align:center;font-weight:bold;">
+                            प्रपत्र-II / FORM-II
+                        </p>
+                        <p class="text-center mt-1">
+                            चल संपत्ति के संबंध में लेन-देन हेतु केंद्रीय सिविल सेवा (आचरण) नियमावली, 1964 के नियम 18 (3) के अंतर्गत पूर्व सूचना देने या पूर्व मंजूरी लेने के लिए प्रपत्र।<br>
+                            Form for giving prior intimation or seeking previous sanction under Rule 18 (3) of the CCS (Conduct) Rules, 1964 for transaction in respect of movable property.
+                        </p>
                     </div>
 
-                    <!-- Main Box -->
-                    <div class="box box-primary">
+
+                    <div class="box box-solid box-primary property-block">
+
+                        <div class="box-header with-border">
+                            <h4 class="box-title">Employee Details</h4>
+                        </div>
                         <div class="box-body">
 
                             <div class="row">
 
-                                <!-- Purpose -->
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label class="required-label">Purpose of application</label>
-                                        <select name="purpose" class="form-control" required>
-                                            <option value="">Select...</option>
-                                            <option value="Sanction for transaction">Sanction for transaction</option>
-                                            <option value="Prior intimation of Transaction">Prior intimation of Transaction</option>
-                                        </select>
+                                        <label class="bold-label">Name of the Government servant</label>
+                                        <input type="text" name="username" class="form-control" readonly>
                                     </div>
                                 </div>
 
-                                <!-- Acquired / Disposed -->
+
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label class="required-label">Acquired or Disposed</label>
-                                        <select name="acquired_disposed" class="form-control" required>
-                                            <option value="">Select...</option>
-                                            <option value="acquired">Acquired</option>
-                                            <option value="disposed">Disposed</option>
-                                        </select>
+                                        <label class="bold-label">Designation</label>
+                                        <input type="text" name="designation" class="form-control" readonly>
                                     </div>
                                 </div>
 
-                                <!-- Mode Acquisition -->
-                                <div class="col-md-4 d-none" id="mode_acquisition">
+
+                                <div class="col-md-4">
                                     <div class="form-group">
-                                        <label class="required-label fw-bold">Mode of acquisition</label>
-                                        <select name="mode_acquisition" class="form-control" required>
-                                            <option value="">Select...</option>
-                                            <option value="Purchase">Purchase</option>
-                                            <option value="Gift">Gift</option>
-                                            <option value="Mortgage">Mortgage</option>
-                                            <option value="Lease">Lease</option>
-                                        </select>
+                                        <label class="bold-label">Service to which belongs </label>
+                                        <input type="text" name="service" class="form-control" readonly>
                                     </div>
                                 </div>
 
-                                <!-- Mode Disposal -->
-                                <div class="col-md-4 d-none" id="mode_disposal">
+
+                                <div class="col-md-4">
                                     <div class="form-group">
-                                        <label class="required-label fw-bold">Mode of disposal</label>
-                                        <select name="mode_disposal" class="form-control" required>
-                                            <option value="">Select...</option>
-                                            <option value="Sale">Sale</option>
-                                            <option value="Gift">Gift</option>
-                                            <option value="Mortgage">Mortgage</option>
-                                            <option value="Lease">Lease</option>
-                                        </select>
+                                        <label class="bold-label">Employee No. / Code No.</label>
+                                        <input type="text" name="emp_code" class="form-control" readonly>
                                     </div>
                                 </div>
 
-                                <!-- Date -->
-                                <div class="col-md-4 d-none" id="date_acq_dis">
+
+                                <div class="col-md-4">
                                     <div class="form-group">
-                                        <label class="required-label fw-bold" id="date_acquisition_disposed">Probable date of acquisition/disposal</label>
-                                        <div class="input-group date">
-                                            <div class="input-group-addon">
-                                                <i class="fa fa-calendar"></i>
-                                            </div>
-                                            <input type="text" class="form-control datepicker" name="date_acquisition_disposed" required>
-                                        </div>
+                                        <label class="bold-label"> Scale of Pay and present pay </label>
+                                        <input type="text" name="payscale" class="form-control" readonly>
                                     </div>
                                 </div>
 
@@ -127,359 +110,132 @@
 
                                 <div class="row">
 
-                                    <!-- Location -->
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label class="required-label">Full Location Details <i class="fa fa-info-circle text-primary" title="Municipal No, Street, Village, Taluka, District, State"></i></label>
-                                            <input type="text" name="property_location[]" class="form-control allow-basic" required>
+                                            <label class="bold-label">Purpose of application</label>
+                                            <input type="text" name="purpose" class="form-control" readonly>
                                         </div>
                                     </div>
 
-                                    <!-- Type -->
+
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label class="required-label">Description Type</label>
-                                            <select name="property_description[]" class="form-control" required>
-                                                <option value="">Select...</option>
-                                                <option value="Housing and Other buildings">Housing and Other buildings</option>
-                                                <option value="Lands">Lands</option>
-                                            </select>
+                                            <label class="bold-label">Whether property is being acquired or disposed of</label>
+                                            <input type="text" name="acquisition_disposed" class="form-control" readonly>
                                         </div>
                                     </div>
 
-                                    <!-- Hold -->
+
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label class="required-label">Freehold or Leasehold</label>
-                                            <select name="property_hold[]" class="form-control" required>
-                                                <option value="">Select...</option>
-                                                <option value="freehold">Freehold</option>
-                                                <option value="leasehold">Leasehold</option>
-                                            </select>
+                                            <label class="bold-label" id="date_acquisition_disposed">Probable date of acquisition/disposal of property</label>
+                                            <input type="text" name="date_acquisition_disposed" class="form-control" readonly>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4" id="mode_acquisition">
+                                        <div class="form-group">
+                                            <label class="bold-label">Mode of acquisition</label>
+                                            <input type="text" name="mode_acquisition" class="form-control" readonly>
+                                            <textarea name="mode_acquisition_other" class="form-control mt-2 d-none" placeholder="Text here..." readonly></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4" id="mode_disposal">
+                                        <div class="form-group">
+                                            <label class="bold-label">Mode of disposal</label>
+                                            <input type="text" name="mode_disposal" class="form-control" readonly>
+                                            <textarea name="mode_disposal_other" class="form-control mt-2 d-none" placeholder="Text here..." readonly></textarea>
                                         </div>
                                     </div>
 
                                 </div>
                                 <!--./row-->
 
-                                <div class="row">
-                                    <!-- Price -->
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label class="required-label property_price_label">Sale/purchase price of the property (in Rupees) </label>
-                                            <input inputmode="numeric" pattern="[0-9]*" name="property_price[]" class="form-control property_price amount-input" required>
-                                            <small class="price_in_text text-success fw-bold"></small>
-                                        </div>
-                                    </div>
+                                <div id="property-lists"></div>
 
-                                    <div class="col-md-8">
-                                        <!-- Applicant Interest -->
-                                        <label class="required-label">Applicant's interest in property (Full/Part) <i class="fa fa-info-circle  text-primary"
-                                                title="Whether applicant's interest in the property is in full or part, in case of partial interest, extent of such interest must be indicated. Ownership of the property, in case transaction is not exclusively in the name of the Government servent, particulars of ownership and share of each member may be given."></i>
-                                        </label>
+                            </div>
+                        </div>
+                    </div>
 
-                                        <div class="rows_applicant">
-                                            <div class="row row-item-applicant">
-                                                <div class="col-md-4">
-                                                    <div class="form-group">
-                                                        <input type="text" name="name_applicant[]" placeholder="Name" class="form-control allow-basic" required>
-                                                    </div>
-                                                </div>
+                    <div class="box box-solid box-primary">
+                        <div class="box-header with-border">
+                            <h4 class="box-title"> Declarations</h4>
+                        </div>
+                        <div class="box-body">
 
-                                                <div class="col-md-2">
-                                                    <div class="form-group">
-                                                        <input inputmode="numeric" pattern="[0-9]*" name="interest_applicant[]" placeholder="%" min="0" max="100" class="form-control interest_percent allow-basic" required>
-                                                    </div>
-                                                </div>
+                            <!-- Gift + Other Info -->
+                            <div class="row">
 
-                                                <div class="col-md-4">
-                                                    <div class="form-group">
-                                                        <select name="relationship_applicant[]" class="form-control" required>
-                                                            <option value="">Relationship...</option>
-                                                            <option value="Self">Self</option>
-                                                            <option value="Father">Father</option>
-                                                            <option value="Mother">Mother</option>
-                                                            <option value="Spouse">Spouse</option>
-                                                            <option value="Brother">Brother</option>
-                                                            <option value="Sister">Sister</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2">
-                                                    <button type="button" class="btn btn-success btn-sm addRow_applicant dynamic-btn">
-                                                        <i class="fa fa-plus"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger btn-sm removeRow_applicant dynamic-btn">
-                                                        <i class="fa fa-minus"></i>
-                                                    </button>
-                                                </div>
-
-                                            </div>
-
-                                        </div>
+                                <!-- Acquisition Gift -->
+                                <div class="col-md-6 d-none" id="acquisition_gift">
+                                    <div class="form-group">
+                                        <label>Sanction is also required under rule 13 of the CCs(Conduct) Rules, 1964?</label>
+                                        <input type="text" name="acquisition_gift" class="form-control" readonly>
                                     </div>
                                 </div>
 
-                                <!-- Sources of Financing -->
-                                <div class="d-none acquisition_sources">
-
-                                    <label class="required-label ">Source(s) from which financed</label>
-
-                                    <div class="rows_source">
-
-                                        <div class="row row-item-source">
-
-                                            <!-- Source Name -->
-                                            <div class="col-md-4">
-                                                <div class="form-group">
-                                                    <input type="text" name="source_name[]" placeholder="Source Name" class="form-control allow-basic" required>
-                                                </div>
-                                            </div>
-
-                                            <!-- Amount -->
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <input type="number" name="source_amount[]" placeholder="Amount (₹)" class="form-control allow-basic source_amount" required>
-                                                </div>
-                                            </div>
-
-                                            <!-- File -->
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <input type="file" name="source_document[]" class="form-control js-source-file-input">
-                                                    <div class="small js-existing-source-attachment d-none"></div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Buttons -->
-                                            <div class="col-md-2" style="margin-top:5px;">
-                                                <button type="button" class="btn btn-success btn-sm addRow_source dynamic-btn">
-                                                    <i class="fa fa-plus"></i>
-                                                </button>
-                                                <button type="button" class="btn btn-danger btn-sm removeRow_source dynamic-btn">
-                                                    <i class="fa fa-minus"></i>
-                                                </button>
-                                            </div>
-
-                                        </div>
-
+                                <!-- Other Relevant -->
+                                <div class="col-md-6" id="other_relevant">
+                                    <div class="form-group">
+                                        <label>Any other relevant fact which the applicant may like to mention</label>
+                                        <textarea class="form-control" readonly name="other_relevant" placeholder="Text here..."></textarea>
                                     </div>
-
                                 </div>
 
-                                <!-- Disposal Property -->
-                                <div class="disposal_property d-none">
-
-                                    <label class="required-label ">Sanction/intimation Status</label>
-
-                                    <div class="row">
-
-                                        <!-- Status -->
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <select class="form-control disposal_status" name="disposal_property[]" required>
-                                                    <option value="">Select...</option>
-                                                    <option value="Yes">Yes</option>
-                                                    <option value="No">No</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <!-- File Upload -->
-                                        <div class="col-md-4 disposal_file_wrapper d-none">
-                                            <div class="form-group">
-                                                <input type="file" class="form-control js-disposal-file-input" name="disposal_property_attachment[]">
-                                                <div class="small js-existing-disposal-attachment" style="margin-top:5px; display:none;"></div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Reason -->
-                                        <div class="col-md-5 disposal_reason_wrapper d-none">
-                                            <div class="form-group">
-                                                <textarea class="form-control" name="disposal_property_reason[]" placeholder="Reason for no status..."></textarea>
-                                            </div>
-                                        </div>
-
-                                    </div>
-
+                                <div class="d-none col-md-12" id="form2_inparts">
+                                    I, <strong class="emp_name_text"></strong> hereby declare that the particulars given above are true.
+                                    I request that I may be given permission to
+                                    <span class="acquired_disposed_value"></span>
+                                    the property as described above from/to
+                                    <strong class="party_name_text"></strong>,
+                                    whose name is mentioned in details of the Parties.
                                 </div>
 
-                                <!-- Details of the Parties -->
-                                <div style="margin-top:20px; padding-top:15px; border-top:1px solid #ddd;">
-
-                                    <h4 class="text-primary"><u><b>Details of the Parties</b></u></h4>
-
-                                    <!-- Name + Address -->
-                                    <div class="row">
-
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label class="required-label">Name of Party</label>
-                                                <input type="text" name="party_name[]" class="form-control allow-basic" required>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label class="required-label">Address of Party</label>
-                                                <textarea class="form-control allow-basic party_address"
-                                                    name="party_address[]" rows="2" required></textarea>
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                    <!-- Related to Applicant -->
-                                    <div class="row">
-
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label class="required-label">Related to Applicant</label>
-                                                <select class="form-control party_relationship" name="party_relationship[]" required>
-                                                    <option value="">Select...</option>
-                                                    <option value="yes">Yes</option>
-                                                    <option value="no">No</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-8 party_relationship_description  d-none">
-                                            <div class="form-group">
-                                                <label class="required-label">Describe relationship</label>
-                                                <input type="text"
-                                                    class="form-control allow-basic"
-                                                    name="party_relationship_description[]"
-                                                    placeholder="Describe relationship...">
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                    <!-- Official dealing -->
-                                    <div class="row">
-
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label class="required-label">Any official dealing with parties</label>
-                                                <select class="form-control" name="applicant_dealing_parties[]" required>
-                                                    <option value="">Select...</option>
-                                                    <option value="yes">Yes</option>
-                                                    <option value="no">No</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-8 applicant_dealing_parties_description d-none">
-                                            <div class="form-group">
-                                                <label class="required-label">Full particulars about the official dealing with parties</label>
-                                                <input type="text"
-                                                    class="form-control allow-basic"
-                                                    name="applicant_dealing_parties_description[]"
-                                                    placeholder="Full particulars about the official dealing with parties...">
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                    <!-- Transaction Mode -->
-                                    <div class="row">
-
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label class="required-label">How was transaction arranged</label>
-                                                <select class="form-control" name="party_transaction_mode[]" required>
-                                                    <option value="">Select...</option>
-                                                    <option value="Statutory Body">Statutory Body</option>
-                                                    <option value="Advertisement">Advertisement</option>
-                                                    <option value="Friends and Relative">Friends and Relative</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                                <!-- Buttons -->
-                                <div class="text-right">
-                                    <button type="button" class="btn btn-success btn-sm addPropertyBtn">
-                                        Add Property
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm removePropertyBtn">
-                                        Remove
-                                    </button>
+                                <!-- Full -->
+                                <div class="d-none col-md-12" id="form2_full">
+                                    I, <strong class="emp_name_text"></strong> hereby intimate the proposed <span class="acquisition_disposed_value"></span> of property by me as detailed above. I declare that the particulars given above are true.
                                 </div>
 
                             </div>
                         </div>
                     </div>
 
-                    <!-- Footer -->
-                    <div class="box box-primary">
+                    <div class="box box-primary" id="status">
+                        <div class="box-header with-border">
+                            <h4 class="box-title"> Action / Remarks</h4>
+                        </div>
                         <div class="box-body">
 
-                            <!-- Gift + Other Info -->
-                            <div class="row" style="margin-top:20px;">
-
-                                <!-- Acquisition Gift -->
-                                <div class="col-md-6 d-none" id="acquisition_gift">
+                            <div class="row">
+                                <div class="col-md-3" id="correctOM-container">
+                                    <input class="form-check-input" type="checkbox" name="correctOM" id="correctOM"> OM found correct.
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 " id='remark'>
                                     <div class="form-group">
-                                        <label class="required-label">Sanction required under rule 13 of CCS Rules</label>
-                                        <select class="form-control" name="acquisition_gift">
+                                        <label>Remarks:</label>
+                                        <textarea id="remarks" name="remarks" class="form-control"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6" id="forwardId">
+                                    <div class="form-group">
+                                        <label>Select Employee to forward:</label>
+                                        <select id="employee" class="form-control" name="employee">
                                             <option value="">Select...</option>
-                                            <option value="yes">Yes</option>
-                                            <option value="no">No</option>
                                         </select>
                                     </div>
                                 </div>
-
-                                <!-- Other Relevant -->
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Any other relevant fact</label>
-                                        <textarea class="form-control allow-basic" name="other_relevant" rows="2"></textarea>
-                                    </div>
-                                </div>
-
                             </div>
-
-                            <!-- Declaration Box -->
-                            <div class="box box-default" style="margin-top:20px;">
-                                <div class="box-body">
-
-                                    <!-- In Parts -->
-                                    <div class="d-none" id="form1_inparts">
-                                        <div class="checkbox">
-                                            <label>
-                                                <input type="checkbox" name="form1_dec" required>
-                                                I, <strong class="emp_name_text underline"></strong> hereby declare that the particulars given above are true.
-                                                I request permission to
-                                                <span class="acquired_disposed_value text-primary"></span>
-                                                the property from/to
-                                                <strong class="party_name_text underline"></strong>.
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    <!-- Full -->
-                                    <div class="d-none" id="form1_full">
-                                        <div class="checkbox">
-                                            <label>
-                                                <input type="checkbox" name="form1_dec1" required>
-                                                I, <strong class="emp_name_text underline"></strong> hereby intimate the proposed
-                                                <span class="acquisition_disposed_value text-primary"></span>
-                                                of property by me. I declare that the particulars given above are true.
-                                            </label>
-                                        </div>
-                                    </div>
-
+                            <div class="row mt-4">
+                                <div class="col-md-12 d-flex justify-content-center gap-2">
+                                    <button type="button" class="btn btn-primary" id="generatebtn" onclick="generateCertificate()">Generate Certificate</button>
+                                    <button type="button" class="btn btn-danger" id="revertbtn" onclick="handleRevert()">Reject</button>
+                                    <button type="button" class="btn btn-success" id="forwardbtn" onclick="handleforward()">Forward</button>
+                                    <button type="button" class="btn btn-primary" id="OMbtn" onclick="openMemo()">View OM</button>
                                 </div>
-                            </div>
-
-                            <div class="text-center">
-                                <button type="button" class="btn btn-warning" onclick="saveDraft()">Save Draft</button>
-                                <button type="button" class="btn btn-success" onclick="submitForm()">Submit</button>
                             </div>
 
                         </div>
@@ -494,30 +250,32 @@
     </div>
     <!-- ./wrapper -->
 
-    <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" id="previewModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-
-                <!-- Header -->
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Confirm Action</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title">File Preview</h4>
                 </div>
 
-                <!-- Body -->
-                <div class="modal-body">
-                    <p id="confirmMessage" style="margin-bottom:0;"></p>
+                <div class="modal-body p-0" style="height:80vh">
+                    <iframe id="previewFrame"> </iframe>
                 </div>
-
-                <!-- Footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default btn-sm" id="confirmCancelBtn" data-dismiss="modal">
-                        Cancel
-                    </button>
-
-                    <button type="button" class="btn btn-danger btn-sm" id="confirmOkBtn">
-                        OK
-                    </button>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="memo" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title">Memo Preview</h4>
+                </div>
+                <!-- BODY -->
+                <div class="modal-body p-4">
+                    <textarea name="memoContent" id="memoContent" class="memoContent"></textarea>
                 </div>
 
             </div>
@@ -525,7 +283,712 @@
     </div>
 
     <?php require 'footer.php'; ?>
-    <script src="../js/immovable.js"></script>
+
+    <script>
+        let usersCache = [];
+        let formId = null;
+        let data = [];
+
+        async function LoadEmployees() {
+            try {
+                const res = await fetch('../api/get_usersData.php');
+                const json = await res.json();
+
+                usersCache = json.success ? json.data : [];
+
+                populateEmployeeDropdown();
+
+            } catch (err) {
+                console.error("Error loading immovable:", err);
+            }
+        }
+
+        async function loadmovableById(id) {
+            try {
+                const res = await fetch('../api/getDataById.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'Application/json'
+                    },
+                    body: JSON.stringify({
+                        id: id
+                    })
+                })
+
+                const json = await res.json();
+                data = json.data;
+                prefillForm(data);
+
+            } catch (error) {
+                console.log("Error", error)
+            }
+        }
+
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        function prefillForm(data) {
+
+            // simple fields
+            document.querySelector('[name="username"]').value = data.user_details.username ?? "";
+            document.querySelector('[name="designation"]').value = data.user_details.designation ?? "";
+            document.querySelector('[name="service"]').value = data.user_details.service ?? "";
+            document.querySelector('[name="emp_code"]').value = data.user_details.emp_code ?? "";
+            document.querySelector('[name="payscale"]').value = data.user_details.payscale ?? "";
+            document.querySelector('[name="purpose"]').value = data.purpose ?? "";
+            document.querySelector('[name="acquisition_disposed"]').value = data.acquired_disposed ?? "";
+            document.querySelector('[name="date_acquisition_disposed"]').value = data.date_acquisition_disposed ?? "";
+            document.querySelector('[name="mode_disposal"]').value = data.mode_disposal ?? "";
+            document.querySelector('[name="mode_acquisition"]').value = data.mode_acquisition ?? "";
+            document.querySelector('[name="acquisition_gift"]').value = data.acquisition_gift ?? "";
+            document.querySelector('[name="other_relevant"]').value = data.other_relevant ?? "";
+
+            if (!data.other_relevant) {
+                document.getElementById("other_relevant").classList.add('d-none')
+            }
+
+
+            if (data.acquired_disposed === 'disposal') {
+                document.getElementById('mode_acquisition').classList.add('d-none');
+                document.getElementById('mode_disposal').classList.remove('d-none')
+            } else {
+                document.getElementById('mode_acquisition').classList.remove('d-none');
+                document.getElementById('mode_disposal').classList.add('d-none')
+            }
+
+            if (data.acquisition_gift !== '') {
+                document.getElementById('acquisition_gift').classList.remove('d-none');
+            } else {
+                document.getElementById('acquisition_gift').classList.add('d-none');
+            }
+
+            if (data.purpose === 'Sanction for transaction') {
+                document.getElementById('form2_inparts').classList.remove('d-none');
+                document.getElementById('form2_full').classList.add('d-none')
+            } else {
+                document.getElementById('form2_inparts').classList.add('d-none');
+                document.getElementById('form2_full').classList.remove('d-none')
+            }
+
+            data.properties.forEach((property, index) => {
+                renderPropertyPreview(data.acquired_disposed, property, index);
+            });
+
+            const correctOM = document.getElementById('correctOM');
+            correctOM.checked = Number(data.correctom) === 1;
+            // disable if prefilled
+            if (Number(data.correctom) === 1) {
+                correctOM.disabled = true;
+            } else {
+                if (sessionStorage.getItem('designation') === "DDG") {
+                    document.getElementById('correctOM-container').classList.add('d-none')
+                }
+            }
+            correctOM.checked = data.correctom == 1;
+
+            if (sessionStorage.getItem('designation') === 'SO') {
+                if (data.forward_to !== '' && data.status === 'Forwarded') {
+                    document.getElementById('remark').classList.add('d-none');
+                    document.getElementById('forwardId').classList.add('d-none');
+                    document.getElementById('forwardbtn').classList.add('d-none');
+                    document.getElementById('revertbtn').classList.add('d-none');
+                }
+                document.getElementById('generatebtn').classList.add('d-none');
+            }
+            if (sessionStorage.getItem('designation') !== 'SO') {
+                document.getElementById('forwardbtn').classList.add('d-none');
+                document.getElementById('forwardId').classList.add('d-none');
+            }
+
+            if (sessionStorage.getItem('username') === data?.user_details?.username) {
+                document.getElementById('status').classList.add('d-none')
+            }
+
+            populateEmployeeDropdown();
+
+        }
+
+        async function generateCertificate() {
+            try {
+                const res = await fetch('../api/generate_pdf_movable.php', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        id: formId
+                    })
+                });
+
+                if (!res.ok) {
+                    throw new Error("Failed to generate PDF");
+                }
+
+                const blob = await res.blob();
+
+                // Create download link
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `Certificate.pdf`;
+                document.body.appendChild(a);
+                a.click();
+
+                // Cleanup
+                a.remove();
+                window.URL.revokeObjectURL(url);
+
+            } catch (err) {
+                alert("Failed to generate certificate");
+            }
+        }
+
+        function renderPropertyPreview(acquired_disposed, property, index) {
+            const container = document.getElementById("property-lists");
+
+            const html = `
+                    <div class="box box-solid box-info">
+                        <div class="box-header with-border">
+                            <h4 class="box-title">Property ${index + 1}</h4>    
+                        </div>
+                        <div class="box-body">  
+
+                            <div class="row mt-3">
+                                
+                                <div class="col-md-4">
+                                    <strong>Details of Property:</strong><br>
+                                    ${property.property_description}
+                                </div>
+
+                                <div class="col-md-4">
+                                    <strong>Property Price:</strong><br>
+                                    ₹ ${property.property_price}
+                                </div>
+
+                            </div>
+
+                            <div class="mt-3">
+                                <strong>Applicants :</strong>
+                                <table class="table table-bordered">
+                                    <tr>
+                                    <th>Name</th>
+                                    <th>Interest (%)</th>
+                                    <th>Relationship</th>
+                                    </tr>
+                                    ${property.applicants
+                                    .map(
+                                        (a) =>
+                                        `
+                                        <tr>
+                                            <td>${a.name} </td>
+                                            <td>${a.interest}</td>
+                                            <td>${a.relationship}</td>
+                                        </tr>`,
+                                    )
+                                    .join("")}
+                                </table>
+                            </div>
+
+                            ${
+                            acquired_disposed !== "disposal"
+                                ? `
+                                <div class="mt-3">
+                                    <strong>Sources :</strong>
+                                    <table class="table table-bordered">
+                                        <tr>
+                                    <th>Name</th>
+                                        <th>Amount (₹)</th>
+                                        <th>Attachment</th>           
+                                        </tr>
+                                        ${property.sources
+                                            .map(
+                                                (a) => `
+                                                <tr>
+                                                    <td>${a.name}</td>
+                                                    <td>${a.amount}</td>
+                                                    <td>
+                                                        ${
+                                                        a.attachment
+                                                            ? `
+                                                            <button type="button"
+                                                                class="btn btn-outline-primary btn-sm"
+                                                                title="Preview File"
+                                                                onclick="openPreview('${a.attachment.file_key}')">
+                                                                <i class="fa fa-eye"></i>
+                                                            </button>
+
+                                                            <a href="../api/view_attachement_file.php?file_key=${a.attachment.file_key}&mode=download"
+                                                                class="btn btn-sm btn-outline-primary ms-2"
+                                                                download>
+                                                                <i class="fa fa-download"></i>
+                                                            </a>
+                                                            `
+                                                            : `<span class="text-muted">No file</span>`
+                                                        }
+                                                    </td>
+                                                </tr>`
+                                            )
+                                        .join("")}
+                                    </table>
+                                </div>`
+                                : `
+                                <div class="mt-3">
+                                    <strong>Sanction/intimation Status : </strong><br>
+                                        ${property.disposal_property === "No" ?
+                                            property.disposal_property + ", " + property.disposal_property_reason 
+                                            :
+                                            property.disposal_property  +  " " + (
+                                            property.disposal_attachment?.file_key
+                                            ? `<button type="button" class="btn btn-outline-primary btn-sm"
+                                                    title="Preview File"
+                                                    onclick="openPreview('${property.disposal_attachment.file_key}')">
+                                                    View Attachment <i class="fas fa-eye"></i>
+                                                </button>`
+                                            : ""
+                                        )}
+                                </div>
+                                `
+                            }
+
+                            <div class="row mt-3">
+
+                                <div class="col-md-6">
+                                    <strong>Party Name:</strong><br>
+                                    ${property.party_name}
+                                </div>
+
+                                <div class="col-md-6">
+                                    <strong>Address:</strong><br>
+                                    ${property.party_address}
+                                </div>
+
+                                <div class="col-md-6 mt-2">
+                                    <strong>Party related to the applicant.</strong><br>
+                                    ${
+                                        property.party_relationship === "yes"
+                                        ? property.party_relationship +
+                                            ", " +
+                                            property.party_relationship_description
+                                        : property.party_relationship
+                                    }
+                                </div>
+
+                                <div class="col-md-6 mt-2">
+                                    <strong>Did the applicant have any official dealing with the parties.</strong><br>
+                                    ${
+                                        property.applicant_dealing_parties === "yes"
+                                        ? property.applicant_dealing_parties +
+                                            ", " +
+                                            property.applicant_dealing_parties_description
+                                        : property.applicant_dealing_parties
+                                    }
+                                </div>
+                                <div class="col-md-6 mt-2">
+                                    <strong>Nature of official dealing with the party</strong><br>
+                                    ${property.nature_dealing_party}
+                                </div>
+
+                                <div class="col-md-6 mt-2">
+                                    <strong>How was the transaction arranged.</strong><br>
+                                    ${property.party_transaction_mode}
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+            container.insertAdjacentHTML("beforeend", html);
+        }
+
+        function openPreview(form_Id) {
+            if (!form_Id) {
+                console.error("openPreview called without file key");
+                return;
+            }
+
+            const frame = document.getElementById("previewFrame");
+            if (!frame) {
+                console.error("previewFrame element not found");
+                return;
+            }
+
+            const $modal = $("#previewModal");
+            if (!$modal.length) {
+                console.error("previewModal element not found");
+                return;
+            }
+
+            const url = "../api/view_attachement_file.php?file_key=" + encodeURIComponent(form_Id) + "&mode=preview";
+            frame.src = url;
+            $modal.modal("show");
+        }
+
+        function openMemo() {
+            const currentDate = new Date().toLocaleDateString('en-GB');
+
+            /* ================= PROPERTY PARAGRAPHS ================= */
+
+            let propertyText = "";
+
+            if (data.properties.length === 1) {
+
+                /* ================= SINGLE PROPERTY FORMAT ================= */
+
+                const property = data.properties[0];
+
+                const applicantsText = property.applicants.length > 0 ?
+                    property.applicants.map(a =>
+                        `${a.interest}% ${a.relationship} (${a.name})`
+                    ).join(" and ") :
+                    "";
+
+                let sourceText = "";
+
+                if (property.sources && property.sources.length > 0) {
+                    const sourcesFormatted = property.sources.map(s =>
+                        `₹${Number(s.amount).toLocaleString('en-IN')}/-`
+                    );
+
+                    sourceText = `
+                        The funds for the said purchase were arranged through 
+                        ${sourcesFormatted.join(" and ")}.
+                    `;
+                }
+
+                propertyText = `
+                    <p style="text-align:justify;">
+                        The movable property, i.e., ${property.property_description}, 
+                        valued at ₹${Number(property.property_price).toLocaleString('en-IN')}/-,
+                        is held by ${applicantsText}.
+                    </p>
+
+                    <p style="text-align:justify;">
+                        The said property is ${applicantsText.includes("100") ? "wholly held by the officer" : "jointly held"} 
+                        and was ${data.acquired_disposed} on ${data.date_acquisition_disposed || "N/A"}.
+                        ${sourceText}
+                    </p>
+                `;
+
+            } else {
+
+                /* ================= MULTIPLE PROPERTY FORMAT ================= */
+
+                data.properties.forEach((property, index) => {
+
+                    const propertyNumber = index + 1;
+
+                    const ordinals = ["first", "second", "third", "fourth"];
+                    const prefix = ordinals[index] ?
+                        `The ${ordinals[index]} property pertains to` :
+                        `The property no. ${propertyNumber} pertains to`;
+
+                    const applicantsText = property.applicants.length > 0 ?
+                        property.applicants.map(a =>
+                            `${a.interest}% in the name of ${a.relationship} (${a.name})`
+                        ).join(" and ") :
+                        "";
+
+                    let sourceText = "";
+
+                    if (property.sources && property.sources.length > 0) {
+                        const sourcesFormatted = property.sources.map(s =>
+                            `₹${Number(s.amount).toLocaleString('en-IN')}/- paid by ${s.name}`
+                        );
+
+                        sourceText = `The funds of this property comprised of ${sourcesFormatted.join(", ")}.`;
+                    }
+
+                    propertyText += `
+                        <p style="text-align:justify;">
+                            <strong>${propertyNumber}.</strong>
+                            ${prefix} ${property.property_description}, 
+                            valued at ₹${Number(property.property_price).toLocaleString('en-IN')}/-,
+                            is held by ${applicantsText}.
+                            The property was ${data.acquired_disposed} on ${data.date_acquisition_disposed || "N/A"}.
+                            ${sourceText}
+                        </p>
+                    `;
+                });
+            }
+
+            /* ================= MAIN MEMO HTML ================= */
+
+            
+            /* ================= OPEN MODAL ================= */
+            document.getElementById("memoContent").value = html;
+
+            $('#memoContent').wysihtml5();
+
+            /* ================= OPEN MODAL ================= */
+            $("#memo").modal("show");
+        }
+
+        document.getElementById('memo').addEventListener('hidden.bs.modal', function() {
+            if (tinymce.get("memoContent")) {
+                tinymce.get("memoContent").remove();
+            }
+        });
+
+        function handleBack() {
+            window.history.back();
+        }
+
+        function populateEmployeeDropdown() {
+            const select = document.getElementById('employee');
+            if (!select) return; // important when modal not opened yet
+
+            select.innerHTML = `<option value="">Select...</option>`;
+
+            usersCache.forEach(user => {
+                select.innerHTML += `
+                    <option value="${user.uid}">
+                        ${user.username ?? user.name ?? 'Unnamed'}
+                    </option>
+                `;
+            });
+        }
+
+        function handlePrint() {
+            const printSection = document.getElementById("print");
+            if (!printSection) return;
+
+            const now = new Date();
+            const formattedDateTime = now.toLocaleString("en-IN", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+            });
+
+            const clone = printSection.cloneNode(true);
+            syncValues(printSection, clone);
+
+            const printWindow = window.open("", "_blank", "width=1000,height=700");
+
+            printWindow.document.open();
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Print</title>
+
+                    ${[...document.querySelectorAll("link, style")]
+                        .map(el => el.outerHTML)
+                        .join("")}
+
+                    <style>
+                        html, body {
+                            height: 100%;
+                        }
+
+                        body {
+                            margin: 20px;
+                            padding-bottom: 70px; /* space for footer */
+                        }
+
+                        button {
+                            display: none !important;
+                        }
+
+                        /* TRUE FOOTER SIMULATION */
+                        .print-footer {
+                            position: fixed;
+                            bottom: 0;
+                            left: 0;
+                            right: 0;
+                            height: 40px;
+                            font-size: 12px;
+
+                            
+                            display: flex;
+                            align-items: center;
+                            justify-content: flex-end;
+                            padding: 0 20px;
+                            background: #fff;
+                        }
+
+                        @media print {
+                            body {
+                                -webkit-print-color-adjust: exact;
+                            }
+
+                            .print-footer {
+                                position: fixed;
+                                bottom: 0;
+                            }
+                        }
+                    </style>
+                </head>
+
+                <body>
+
+                    ${clone.outerHTML}
+
+                    <div class="print-footer">
+                        <strong>Printed On:</strong>&nbsp;${formattedDateTime}
+                    </div>
+
+                </body>
+                </html>
+            `);
+
+            printWindow.document.close();
+
+            setTimeout(() => {
+                printWindow.focus();
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+        }
+        /* =========================
+           SYNC INPUT VALUES
+        ========================= */
+        function syncValues(original, clone) {
+            const originalEls = original.querySelectorAll("input, textarea, select");
+            const clonedEls = clone.querySelectorAll("input, textarea, select");
+
+            originalEls.forEach((el, i) => {
+                const cloneEl = clonedEls[i];
+                if (!cloneEl) return;
+
+                if (el.tagName === "INPUT") {
+                    if (el.type === "checkbox" || el.type === "radio") {
+                        cloneEl.checked = el.checked;
+
+                        if (el.checked) {
+                            cloneEl.setAttribute("checked", "checked");
+                        } else {
+                            cloneEl.removeAttribute("checked");
+                        }
+                    } else {
+                        cloneEl.value = el.value;
+                        cloneEl.setAttribute("value", el.value);
+                    }
+                } else if (el.tagName === "TEXTAREA") {
+                    cloneEl.value = el.value;
+                    cloneEl.innerHTML = el.value;
+                } else if (el.tagName === "SELECT") {
+                    Array.from(el.options).forEach((opt, idx) => {
+                        if (cloneEl.options[idx]) {
+                            cloneEl.options[idx].selected = opt.selected;
+
+                            if (opt.selected) {
+                                cloneEl.options[idx].setAttribute("selected", "selected");
+                            } else {
+                                cloneEl.options[idx].removeAttribute("selected");
+                            }
+                        }
+                    });
+                }
+            });
+        }
+        /* =========================
+            FORWARD CLICK textarea + select required
+         ========================= */
+        async function handleforward() {
+            clearValidation();
+
+            let isValid = true;
+            const formData = new FormData();
+            const remarks = document.getElementById('remarks');
+            const employee = document.getElementById('employee');
+            const correctOM = document.getElementById('correctOM').checked ? 1 : 0;
+
+
+            if (!remarks.value.trim()) {
+                remarks.classList.add('is-invalid');
+                isValid = false;
+            }
+
+            if (!employee.value) {
+                employee.classList.add('is-invalid');
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            formData.append("id", formId);
+            formData.append("remarks", remarks.value);
+            formData.append("employee", employee.value);
+            formData.append('correctOM', correctOM);
+            formData.append("action", "forward");
+
+            try {
+
+                const res = await fetch("../api/updateForm.php", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const json = await res.json();
+
+                if (json.success) {
+                    showAlert("Forwarded successfully!", "success");
+                    window.location.href = "requestLists.php"
+                }
+
+            } catch (err) {
+                showAlert("Server error", "danger");
+            }
+        }
+
+        /* =========================
+           BACK CLICK only textarea required
+        ========================= */
+        async function handleRevert() {
+            clearValidation();
+
+            const formData = new FormData();
+
+            const remarks = document.getElementById('remarks');
+
+            if (!remarks.value.trim()) {
+                remarks.classList.add('is-invalid');
+                return;
+            }
+            formData.append("id", formId);
+            formData.append("remarks", remarks.value);
+            formData.append("action", "revert");
+
+            try {
+
+                const res = await fetch("../api/updateForm.php", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const json = await res.json();
+
+                if (json.success) {
+                    showAlert("Reverted successfully!", "success");
+                    window.location.href = "requestLists.php"
+                }
+
+            } catch (err) {
+                showAlert("Server error", "danger");
+            }
+        }
+
+        function clearValidation() {
+            document.querySelectorAll('.is-invalid').forEach(el => {
+                el.classList.remove('is-invalid');
+            });
+        }
+
+        (async function init() {
+            await LoadEmployees();
+            const id = getQueryParam("id");
+            if (id) {
+                formId = id;
+                loadmovableById(id);
+            }
+
+        })();
+    </script>
 
 </body>
 

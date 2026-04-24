@@ -67,31 +67,31 @@
 
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label class="bold-label">Name of the Government servant</label>
+                                        <label class="bold-label">Designation</label>
                                         <input type="text" name="designation" class="form-control" readonly>
                                     </div>
                                 </div>
 
 
-                                <div class="col-md-4 d-none" id="mode_acquisition">
+                                <div class="col-md-4">
                                     <div class="form-group">
-                                        <label class="bold-label">Name of the Government servant</label>
+                                        <label class="bold-label">Service to which belongs </label>
                                         <input type="text" name="service" class="form-control" readonly>
                                     </div>
                                 </div>
 
 
-                                <div class="col-md-4 d-none" id="mode_disposal">
+                                <div class="col-md-4">
                                     <div class="form-group">
-                                        <label class="bold-label">Name of the Government servant</label>
+                                        <label class="bold-label">Employee No. / Code No.</label>
                                         <input type="text" name="emp_code" class="form-control" readonly>
                                     </div>
                                 </div>
 
 
-                                <div class="col-md-4 d-none" id="date_acq_dis">
+                                <div class="col-md-4">
                                     <div class="form-group">
-                                        <label class="bold-label">Name of the Government servant</label>
+                                        <label class="bold-label"> Scale of Pay and present pay </label>
                                         <input type="text" name="payscale" class="form-control" readonly>
                                     </div>
                                 </div>
@@ -136,7 +136,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-4" id="mode_acquisition">
                                         <div class="form-group">
                                             <label class="bold-label">Mode of acquisition</label>
                                             <input type="text" name="mode_acquisition" class="form-control" readonly>
@@ -144,7 +144,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-4" id="mode_disposal">
                                         <div class="form-group">
                                             <label class="bold-label">Mode of disposal</label>
                                             <input type="text" name="mode_disposal" class="form-control" readonly>
@@ -216,7 +216,7 @@
                                     <input class="form-check-input" type="checkbox" name="correctOM" id="correctOM"> OM found correct.
                                 </div>
                             </div>
-                            <div class="row mt-3">
+                            <div class="row">
                                 <div class="col-md-6 " id='remark'>
                                     <div class="form-group">
                                         <label>Remarks:</label>
@@ -255,31 +255,30 @@
     <!-- ./wrapper -->
 
     <div class="modal fade" id="previewModal" tabindex="-1">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header modal-dark p-2">
-                    <span class="modal-title">File Preview</span>
-                    <button class="btn-close btn-sm" data-bs-dismiss="modal"></button>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title">File Preview</h4>
                 </div>
+
                 <div class="modal-body p-0" style="height:80vh">
-                    <iframe
-                        id="previewFrame"
-                        style="width:100%;height:100%;border:none">
-                    </iframe>
+                    <iframe id="previewFrame"> </iframe>
                 </div>
             </div>
         </div>
     </div>
     <div class="modal fade" id="memo" tabindex="-1">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
-            <div class="modal-content" style="height: -webkit-fill-available;">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Memo Preview</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title">Memo Preview</h4>
                 </div>
-
                 <!-- BODY -->
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     <textarea name="memoContent" id="memoContent" class="memoContent"></textarea>
                 </div>
 
@@ -460,32 +459,32 @@
                     <div class="box-header with-border">
                         <h4 class="box-title">Property ${index + 1}</h4>    
                     </div>
-                    <div class="box-body">
+                    <div class="box-body">                    
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3 ">
                                 <strong>Location:</strong><br>
                                 ${property.property_location}
                             </div>
 
-                            <div class="col-md-6 ">
+                            <div class="col-md-3 ">
                                 <strong>Description:</strong><br>
                                 ${property.property_description}
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-3 mt-2">
                                 <strong>Hold Type:</strong><br>
                                 ${property.property_hold}
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-3 mt-2">
                                 <strong>Property Price:</strong><br>
                                 ₹ ${property.property_price}
                             </div>
-                        </div>
 
+                        </div>
                         <div class="mt-3">
                             <strong>Applicants :</strong>
-                            <table class="table table-bordered">
+                            <table class="table table-bordered table-striped">
                                 <tr>
                                 <th>Name</th>
                                 <th>Interest (%)</th>
@@ -504,34 +503,68 @@
                                 .join("")}
                             </table>
                         </div>
-
                         ${
-                            property.sources && property.sources.length > 0
+                        acquired_disposed !== "disposed"
                             ? `
                                 <div class="mt-3">
-                                    <strong>Sources of Fund:</strong>
-                                    <table class="table table-bordered">
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Amount</th>
-                                        </tr>
-                                        ${property.sources
-                                        .map(
-                                            (s) =>
-                                            `
+                                    <strong>Sources :</strong>
+                                    <table class="table table-bordered table-striped">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Amount (₹)</th>
+                                        <th>Attachment</th>                                    
+                                    </tr>
+                                    ${property.sources.map((a) => {
+                                        const fileKey = a.attachment?.file_key;
+                                        const downloadUrl = a.attachment?.download_url;
+
+                                        return `
                                             <tr>
-                                                <td>${s.name} </td>
-                                                <td>₹ ${Number(s.amount).toLocaleString('en-IN')}</td>
-                                            </tr>`,
-                                        )
-                                        .join("")}
+                                                <td>${a.name || ''}</td>
+                                                <td>${a.amount || ''}</td>
+                                                <td>
+                                                    ${
+                                                    fileKey
+                                                        ? `
+                                                            <button type="button"
+                                                                class="btn btn-outline-primary btn-sm"
+                                                                onclick="openPreview('${fileKey}')">
+                                                                <i class="fa fa-eye"></i>
+                                                            </button>
+
+                                                            <a href="../api/view_attachement_file.php?file_key=${fileKey}&mode=download"
+                                                            class="btn btn-sm btn-outline-primary ms-2"
+                                                            download>
+                                                            <i class="fa fa-download"></i>
+                                                            </a>
+                                                        `
+                                                        : `<span class="text-muted">No file</span>`
+                                                    }
+                                                </td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
                                     </table>
-                                </div>
+                                </div>`
+                            : `
+                            <div class="mt-3">
+                            <strong>Sanction/intimation Status : </strong><br>
+                                ${property.disposal_property === "No" ?
+                                    property.disposal_property + ", " + property.disposal_property_reason 
+                                    :
+                                    property.disposal_property  +  " " + (
+                                            property.disposal_attachment?.file_key
+                                            ? `<button type="button" class="btn btn-outline-primary btn-sm"
+                                                    title="Preview File"
+                                                    onclick="openPreview('${property.disposal_attachment.file_key}')">
+                                                    View Attachment <i class="fa fa-eye"></i>
+                                                </button>`
+                                            : ""
+                                        )}
+                            </div>              
                             `
-                            : ""
                         }
-                        
-                        <div class="row mt-3">
+                        <div class="row">
 
                             <div class="col-md-6">
                                 <strong>Party Name:</strong><br>
@@ -569,24 +602,78 @@
                                 ${property.party_transaction_mode}
                             </div>
 
-                        </div>
-                        
+                        </div>                        
                     </div>
                 </div>
-
-
                 `;
             container.insertAdjacentHTML("beforeend", html);
         }
 
         function openPreview(form_Id) {
-            const frame = document.getElementById("previewFrame");
-            frame.src = `api/view_attachement_file.php?file_key=${form_Id}&mode=preview`;
+            if (!form_Id) {
+                console.error("openPreview called without file key");
+                return;
+            }
 
-            const modal = new bootstrap.Modal(
-                document.getElementById("previewModal")
-            );
-            modal.show();
+            const frame = document.getElementById("previewFrame");
+            if (!frame) {
+                console.error("previewFrame element not found");
+                return;
+            }
+
+            const $modal = $("#previewModal");
+            if (!$modal.length) {
+                console.error("previewModal element not found");
+                return;
+            }
+
+            const url = "../api/view_attachement_file.php?file_key=" + encodeURIComponent(form_Id) + "&mode=preview";
+            frame.src = url;
+            $modal.modal("show");
+        }
+
+        function openPreview(fileKey) {
+            const iframe = document.getElementById("previewFrame");
+            iframe.src = `../api/view_attachement_file.php?file_key=${fileKey}&mode=preview`;
+
+            $('#previewModal').modal('show');
+        }
+
+        function showConfirm(message) {
+            return new Promise((resolve) => {
+                const $modal = $("#confirmModal");
+                const $message = $("#confirmMessage");
+                const $okBtn = $("#confirmOkBtn");
+                const $cancelBtn = $("#confirmCancelBtn");
+
+                $message.text(message);
+
+                let resolved = false;
+
+                function cleanup(result) {
+                    if (resolved) return;
+                    resolved = true;
+
+                    $modal.modal("hide");
+                    resolve(result);
+                }
+
+                // Remove old handlers to avoid stacking
+                $okBtn.off("click").on("click", () => cleanup(true));
+                $cancelBtn.off("click").on("click", () => cleanup(false));
+
+                // Focus cancel button when modal opens
+                $modal.off("shown.bs.modal").on("shown.bs.modal", function() {
+                    $cancelBtn.focus();
+                });
+
+                // Handle close (X / backdrop / ESC)
+                $modal.off("hidden.bs.modal").on("hidden.bs.modal", function() {
+                    cleanup(false);
+                });
+
+                $modal.modal("show");
+            });
         }
 
         function openMemo() {
@@ -681,75 +768,72 @@
             /* ================= MAIN MEMO HTML ================= */
 
             let html = `
-                <div class="header">
-                    <div><strong>F. No. PF-7625/NIC/2026-Adm.II</strong></div>
-                    <div><strong>Government of India</strong></div>
-                    <div><strong>Ministry of Electronics and Information Technology</strong></div>
-                    <div><strong>National Informatics Centre</strong></div>
-                    <div>(Administration Section-II)</div>
-                </div>
+                <div style="font-family:'Times New Roman', serif; font-size:14px; line-height:1.6; padding:20px;">
 
-                <div class="right">
-                    A – Block, CGO Complex,<br>
-                    Lodhi Road, New Delhi – 110003<br>
-                    Dated: ${currentDate}
-                </div>
+                    <div style="text-align:center; font-weight:bold; line-height:1.4;">
+                        <div>F. No. PF-7625/NIC/2026-Adm.II</div>
+                        <div>Government of India</div>
+                        <div>Ministry of Electronics and Information Technology</div>
+                        <div>National Informatics Centre</div>
+                        <div>(Administration Section-II)</div>
+                    </div>
 
-                <div class="title">MEMORANDUM</div>
+                    <div style="text-align:right; margin-top:10px;">
+                        A – Block, CGO Complex,<br>
+                        Lodhi Road, New Delhi – 110003<br>
+                        Dated: ${currentDate}
+                    </div>
 
-                <div class="subject">
-                    Subject: Intimation regarding ${data.acquired_disposed} of Immovable Property – reg.
-                </div>
+                    <div style="text-align:center; font-weight:bold; margin:20px 0;">
+                        MEMORANDUM
+                    </div>
 
-                <p style="text-align:justify;">
-                    The undersigned is directed to refer to the application in Form-I dated 
-                    ${data.date_acquisition_disposed}
-                    submitted by ${data.user_details.username}, ${data.user_details.designation} 
-                    (Employee Code: ${data.user_details.emp_code}),
-                    regarding the ${data.acquired_disposed} of immovable property.
-                </p>
+                    <div style="font-weight:bold; margin-bottom:15px;">
+                        Subject: Intimation regarding ${data.acquired_disposed} of movable Property – reg.
+                    </div>
 
-                ${propertyText}
+                    <p style="text-align:justify;">
+                        The undersigned is directed to refer to the application in Form-II dated 
+                        ${data.date_acquisition_disposed}
+                        submitted by ${data.user_details.username}, ${data.user_details.designation} 
+                        (Employee Code: ${data.user_details.emp_code}),
+                        regarding the ${data.acquired_disposed} of movable property.
+                    </p>
 
-                <p style="text-align:justify;">
-                    The intimation given in Form-I under Rule 18(2) of the Central Civil
-                    Services (Conduct) Rules, 1964, is hereby acknowledged for the
-                    aforementioned ${data.acquired_disposed} of immovable property. The officer is advised to
-                    strictly adhere to the time frame and procedure prescribed under the
-                    Central Civil Services (Conduct) Rules, 1964 for such transactions in future.
-                </p>
+                    ${propertyText}
 
-                <div class="signature">
-                    <strong>(Balraj Singh)</strong><br>
-                    HoD & Joint Director<br>
-                    Tel:- 24305006<br>
-                    Email:- s.balraj@nic.in
-                </div>
+                    <p style="text-align:justify;">
+                        The intimation given in Form-II under Rule 18(3) of the Central Civil
+                        Services (Conduct) Rules, 1964, is hereby acknowledged for the
+                        aforementioned ${data.acquired_disposed} of movable property.
+                    </p>
 
-                <div class="copy">
-                    <p><strong>To:</strong> ${data.user_details.username}, ${data.user_details.designation}, Employee Code: ${data.user_details.emp_code}</p>
-                    <p><strong>Copy to:</strong></p>
-                    <ol>
-                        <li>Vol-II/${data.user_details.emp_code}</li>
-                        <li>Office Copy</li>
-                    </ol>
+                    <div style="margin-top:40px; text-align:right;">
+                        <strong>(Balraj Singh)</strong><br>
+                        HoD & Joint Director<br>
+                        Tel:- 24305006<br>
+                        Email:- s.balraj@nic.in
+                    </div>
+
+                    <div style="margin-top:30px;">
+                        <p><strong>To:</strong> ${data.user_details.username}, ${data.user_details.designation}, Employee Code: ${data.user_details.emp_code}</p>
+                    </div>
+
                 </div>
             `;
 
             document.getElementById("memoContent").value = html;
 
-            $('#memoContent').wysihtml5();
+            $('#memoContent').wysihtml5({
+                html: true,
+                StyleSheets: [
+                    '../dist/css/customStyle.css'
+                ]
+            });
 
             /* ================= OPEN MODAL ================= */
-            const modal = new bootstrap.Modal(document.getElementById("memo"));
-            modal.show();
+            $("#memo").modal("show");
         }
-
-        document.getElementById('memo').addEventListener('hidden.bs.modal', function() {
-            if (tinymce.get("memoContent")) {
-                tinymce.get("memoContent").remove();
-            }
-        });
 
         function handleBack() {
             window.history.back();

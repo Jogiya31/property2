@@ -474,3 +474,40 @@
 .wysihtml5-toolbar .btn[data-wysihtml5-command="foreColor"] {
     display: none !important;
 }
+
+
+
+.wysihtml5-sandbox {
+    width: 100% !important;
+}
+
+.header {
+    text-align: center;
+    font-weight: bold;
+}
+
+.right {
+    text-align: right;
+    margin-top: 10px;
+}
+
+.title {
+    text-align: center;
+    font-weight: bold;
+    margin: 20px 0;
+    font-size: 18px;
+}
+
+.subject {
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.signature {
+    text-align: right;
+    margin-top: 40px;
+}
+
+.copy {
+    margin-top: 40px;
+}

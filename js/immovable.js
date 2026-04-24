@@ -1007,6 +1007,7 @@ function showConfirm(message) {
     $modal.modal("show");
   });
 }
+
 function prefillApplicantRow(block) {
   if (!block) return;
 
